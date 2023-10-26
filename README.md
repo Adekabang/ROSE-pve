@@ -27,12 +27,12 @@ Ubuntu
 * 23.04 (Lunar Lobster) - daily builds
 
 Fedora 
-*37
+* 37
 * 38
 
 CentOS Stream
 * Stream 8
-* Stream 9 (daily) - they don't have a 'latest' link?
+* Stream 9 (daily)
 
 Rocky Linux
 * 8 Generic (Green Obsidian)
