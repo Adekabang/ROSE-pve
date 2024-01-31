@@ -1,6 +1,7 @@
 ## Pre-Installation
 
 ```sh
+apt update -y
 apt install git vim -y
 ```
 
