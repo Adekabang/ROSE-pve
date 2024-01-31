@@ -62,3 +62,34 @@ lvremove /dev/pve/data
 lvresize -l +100%FREE /dev/pve/root
 resize2fs /dev/mapper/pve-root
 ```
+
+## Add PAM User In Proxmox: In 3 Steps
+In order to add the PAM user in Proxmox, we should execute mainly three steps, namely:
+
+1. Firstly, create the user in OS. 
+2. Secondly, add the OS user to Proxmox. 
+3. Lastly, set the permission to the user. 
+
+
+### 1. Creating the user in OS
+In order to add the user, we need to run the below command:
+```
+adduser --shell /bin/bash <user>
+usermod -aG sudo <user>
+```
+
+### 2. Adding OS user to Proxmox
+In order to add a user to Proxmox, run the code:
+```
+pveum user add <user>@pam
+pveum user list
+```
+
+### 3. Setting the permission/role to the user.
+The user role is set by using the code:
+```
+pveum acl modify <PATH> --roles PVEAdmin --users <user>@pam
+```
+
+The default roles in Proxmox VE are as follows: Administrator, PVEAdmin, PVEVMAdmin, PVEVMUser, PVEUserAdmin, PVEDatastoreAdmin, PVEDatastoreUser, PVESysAdmin, PVEPoolAdmin, PVETemplateUser, and PVEAuditor. Additionally, there is a “NoAccess” role to forbid access.
+
