@@ -76,6 +76,8 @@ In order to add the user, we need to run the below command:
 ```
 adduser --shell /bin/bash <user>
 usermod -aG sudo <user>
+# optional to bypass sudo
+echo "<user> ALL=(ALL) NOPASSWD: ALL" >>/etc/sudoers
 ```
 
 ### 2. Adding OS user to Proxmox
@@ -93,3 +95,7 @@ pveum acl modify <PATH> --roles PVEAdmin --users <user>@pam
 
 The default roles in Proxmox VE are as follows: Administrator, PVEAdmin, PVEVMAdmin, PVEVMUser, PVEUserAdmin, PVEDatastoreAdmin, PVEDatastoreUser, PVESysAdmin, PVEPoolAdmin, PVETemplateUser, and PVEAuditor. Additionally, there is a “NoAccess” role to forbid access.
 
+### If sudo not exist
+```
+apt install sudo
+```
