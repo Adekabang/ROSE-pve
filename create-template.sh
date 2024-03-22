@@ -13,12 +13,12 @@ function create_template() {
     #Feel free to change any of these to your liking
     qm create $1 --name $2 --ostype l26 
     #Set networking to default bridge
-    qm set $1 --net0 virtio,bridge=vmbr0
+    qm set $1 --net0 virtio,bridge=${network}
     #Set display to serial
     qm set $1 --serial0 socket --vga serial0
     #Set memory, cpu, type defaults
     #If you are in a cluster, you might need to change cpu type
-    qm set $1 --memory 2048 --cores 4 --cpu host
+    qm set $1 --memory ${memory} --cores ${cpu} --cpu host
     #Set boot device to new file
     qm set $1 --scsi0 ${storage}:0,import-from="$(pwd)/$3",discard=on
     #Set scsi hardware as default boot disk using virtio scsi single
@@ -38,9 +38,9 @@ function create_template() {
     qm set $1 --cipassword ${password}
     #Add the user
     qm set $1 --ciuser ${username}
-    #Resize the disk to 128G, a reasonable minimum. You can expand it more later.
-    #If the disk is already bigger than 128G, this will fail, and that is okay.
-    qm disk resize $1 scsi0 128G
+    #Resize the disk to 25G, a reasonable minimum. You can expand it more later.
+    #If the disk is already bigger than 25G, this will fail, and that is okay.
+    qm disk resize $1 scsi0 25G
     #Make it a template
     qm template $1
 
@@ -58,12 +58,19 @@ function create_template() {
 #on the Proxmox system
 export ssh_keyfile=/root/.ssh/authorized_keys
 #Username to create on VM template
-export username=tech
+export username=root
 #Set password on VM template
 export password=password
 
 #Name of your storage
-export storage=pool01
+export storage=local
+
+#Name of your network interface
+export network=vmbr1
+
+#Set CPU and memory on VM template
+export cpu=2
+export memory=2048
 
 #The images that I've found premade
 #Feel free to add your own
@@ -77,11 +84,7 @@ test -f $(pwd)/debian-11-genericcloud-amd64.qcow2 || wget "https://cloud.debian.
 create_template 2001 "temp-debian-11" "debian-11-genericcloud-amd64.qcow2" 
 #Bookworm (12)
 test -f $(pwd)/debian-12-genericcloud-amd64.qcow2 || wget "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
-create_template 2002 "temp-debian-12" "debian-12-genericcloud-amd64.qcow2" 
-#Trixie hasn't started pushing dailies yet, but it will be template 903
-#Sid (Unstable)
-test -f $(pwd)/debian-sid-genericcloud-amd64-daily.qcow2 || wget "https://cloud.debian.org/images/cloud/sid/daily/latest/debian-sid-genericcloud-amd64-daily.qcow2"
-create_template 2009 "temp-debian-sid" "debian-sid-genericcloud-amd64-daily.qcow2" 
+create_template 2002 "temp-debian-12" "debian-12-genericcloud-amd64.qcow2"
 
 ## Ubuntu
 #20.04 (Focal Fossa)
@@ -90,23 +93,21 @@ create_template 2010 "temp-ubuntu-20-04" "ubuntu-20.04-server-cloudimg-amd64.img
 #22.04 (Jammy Jellyfish)
 test -f $(pwd)/ubuntu-22.04-server-cloudimg-amd64.img || wget "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
 create_template 2011 "temp-ubuntu-22-04" "ubuntu-22.04-server-cloudimg-amd64.img" 
-#23.04 (Lunar Lobster) - daily builds
-test -f $(pwd)/lunar-server-cloudimg-amd64.img || wget "https://cloud-images.ubuntu.com/lunar/current/lunar-server-cloudimg-amd64.img"
-create_template 2012 "temp-ubuntu-23-04-daily" "lunar-server-cloudimg-amd64.img"
 
 ## Fedora 
-#37
-test -f $(pwd)/Fedora-Cloud-Base-37-1.7.x86_64.qcow2 || wget https://download.fedoraproject.org/pub/fedora/linux/releases/37/Cloud/x86_64/images/Fedora-Cloud-Base-37-1.7.x86_64.qcow2
-create_template 2020 "temp-fedora-37" "Fedora-Cloud-Base-37-1.7.x86_64.qcow2"
 #38
 test -f $(pwd)/Fedora-Cloud-Base-38-1.6.x86_64.qcow2 || wget https://download.fedoraproject.org/pub/fedora/linux/releases/38/Cloud/x86_64/images/Fedora-Cloud-Base-38-1.6.x86_64.qcow2
-create_template 2021 "temp-fedora-38" "Fedora-Cloud-Base-38-1.6.x86_64.qcow2"
+create_template 2020 "temp-fedora-38" "Fedora-Cloud-Base-38-1.6.x86_64.qcow2"
+#39
+test -f $(pwd)/Fedora-Cloud-Base-39-1.5.x86_64.qcow2 || wget https://download.fedoraproject.org/pub/fedora/linux/releases/39/Cloud/x86_64/images/Fedora-Cloud-Base-39-1.5.x86_64.qcow2
+create_template 2021 "temp-fedora-39" "Fedora-Cloud-Base-39-1.5.x86_64.qcow2"
+
 
 ## CentOS Stream
 #Stream 8
 test -f $(pwd)/CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2 || wget https://cloud.centos.org/centos/8-stream/x86_64/images/CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2
 create_template 2030 "temp-centos-8-stream" "CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2"
-#Stream 9 (daily) - they don't have a 'latest' link?
+#Stream 9
 test -f $(pwd)/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2 || wget https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2
 create_template 2031 "temp-centos-9-stream-daily" "CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2"
 
