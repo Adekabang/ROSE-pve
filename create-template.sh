@@ -94,6 +94,7 @@ create_template 2010 "temp-ubuntu-20-04" "ubuntu-20.04-server-cloudimg-amd64.img
 test -f $(pwd)/ubuntu-22.04-server-cloudimg-amd64.img || wget "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
 create_template 2011 "temp-ubuntu-22-04" "ubuntu-22.04-server-cloudimg-amd64.img" 
 
+: '
 ## Fedora 
 #38
 test -f $(pwd)/Fedora-Cloud-Base-38-1.6.x86_64.qcow2 || wget https://download.fedoraproject.org/pub/fedora/linux/releases/38/Cloud/x86_64/images/Fedora-Cloud-Base-38-1.6.x86_64.qcow2
@@ -101,7 +102,7 @@ create_template 2020 "temp-fedora-38" "Fedora-Cloud-Base-38-1.6.x86_64.qcow2"
 #39
 test -f $(pwd)/Fedora-Cloud-Base-39-1.5.x86_64.qcow2 || wget https://download.fedoraproject.org/pub/fedora/linux/releases/39/Cloud/x86_64/images/Fedora-Cloud-Base-39-1.5.x86_64.qcow2
 create_template 2021 "temp-fedora-39" "Fedora-Cloud-Base-39-1.5.x86_64.qcow2"
-
+'
 
 ## CentOS Stream
 #Stream 8
