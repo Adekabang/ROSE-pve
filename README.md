@@ -7,8 +7,8 @@ apt install git vim -y
 
 ## Theme Installation
 ```
-git clone https://github.com/Adekabang/RISS-pve.git
-cd RISS-pve
+git clone https://github.com/Adekabang/ROSE-pve.git
+cd ROSE-pve
 
 cd theme-xxx
 ./changelogo.sh
