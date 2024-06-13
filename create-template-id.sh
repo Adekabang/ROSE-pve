@@ -78,60 +78,60 @@ export memory=2048
 ## Debian
 #Buster (10)
 test -f $(pwd)/debian-10-genericcloud-amd64.qcow2 || wget "https://cloud.debian.org/images/cloud/buster/latest/debian-10-genericcloud-amd64.qcow2"
-create_template 2001 "temp-debian-10" "debian-10-genericcloud-amd64.qcow2"
+create_template 3001 "temp-debian-10" "debian-10-genericcloud-amd64.qcow2"
 #Bullseye (11)
 test -f $(pwd)/debian-11-genericcloud-amd64.qcow2 || wget "https://cloud.debian.org/images/cloud/bullseye/latest/debian-11-genericcloud-amd64.qcow2"
-create_template 2002 "temp-debian-11" "debian-11-genericcloud-amd64.qcow2" 
+create_template 3002 "temp-debian-11" "debian-11-genericcloud-amd64.qcow2" 
 #Bookworm (12)
 test -f $(pwd)/debian-12-genericcloud-amd64.qcow2 || wget "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
-create_template 2003 "temp-debian-12" "debian-12-genericcloud-amd64.qcow2"
+create_template 3003 "temp-debian-12" "debian-12-genericcloud-amd64.qcow2"
 
 ## Ubuntu
 #20.04 (Focal Fossa)
 test -f $(pwd)/ubuntu-20.04-server-cloudimg-amd64.img || wget "https://cloud-images.ubuntu.com/releases/20.04/release/ubuntu-20.04-server-cloudimg-amd64.img"
-create_template 2011 "temp-ubuntu-20-04" "ubuntu-20.04-server-cloudimg-amd64.img" 
+create_template 3011 "temp-ubuntu-20-04" "ubuntu-20.04-server-cloudimg-amd64.img" 
 #22.04 (Jammy Jellyfish)
 test -f $(pwd)/ubuntu-22.04-server-cloudimg-amd64.img || wget "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
-create_template 2012 "temp-ubuntu-22-04" "ubuntu-22.04-server-cloudimg-amd64.img" 
+create_template 3012 "temp-ubuntu-22-04" "ubuntu-22.04-server-cloudimg-amd64.img" 
 #24.04 (Noble Numbat)
 test -f $(pwd)/ubuntu-24.04-server-cloudimg-amd64.img || wget "https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img"
-create_template 2013 "temp-ubuntu-24-04" "ubuntu-24.04-server-cloudimg-amd64.img" 
+create_template 3013 "temp-ubuntu-24-04" "ubuntu-24.04-server-cloudimg-amd64.img" 
 
 
 ## CentOS Stream
 #Stream 8
 test -f $(pwd)/CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2 || wget https://cloud.centos.org/centos/8-stream/x86_64/images/CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2
-create_template 2031 "temp-centos-8-stream" "CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2"
+create_template 3031 "temp-centos-8-stream" "CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2"
 #Stream 9
 test -f $(pwd)/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2 || wget https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2
-create_template 2032 "temp-centos-9-stream-daily" "CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2"
+create_template 3032 "temp-centos-9-stream-daily" "CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2"
 
 ## Rocky Linux
 #8 Generic (Green Obsidian)
 test -f $(pwd)/Rocky-8-GenericCloud-Base.latest.x86_64.qcow2 || wget https://mirror.nevacloud.com/rockylinux/8/images/x86_64/Rocky-8-GenericCloud-Base.latest.x86_64.qcow2
-create_template 2041 "temp-rocky-linux-8-generic" "Rocky-8-GenericCloud-Base.latest.x86_64.qcow2"
+create_template 3041 "temp-rocky-linux-8-generic" "Rocky-8-GenericCloud-Base.latest.x86_64.qcow2"
 #9 Generic (Blue Onyx)
 test -f $(pwd)/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2 || wget https://mirror.nevacloud.com/rockylinux/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2
-create_template 2042 "temp-rocky-linux-9-generic" "Rocky-9-GenericCloud-Base.latest.x86_64.qcow2"
+create_template 3042 "temp-rocky-linux-9-generic" "Rocky-9-GenericCloud-Base.latest.x86_64.qcow2"
 
 ## Alma Linux
 #8 Generic 
 test -f $(pwd)/AlmaLinux-8-GenericCloud-latest.x86_64.qcow2 || wget https://mirror.nevacloud.com/almalinux/8/cloud/x86_64/images/AlmaLinux-8-GenericCloud-latest.x86_64.qcow2
-create_template 2051 "temp-almalinux-8-generic" "AlmaLinux-8-GenericCloud-latest.x86_64.qcow2"
+create_template 3051 "temp-almalinux-8-generic" "AlmaLinux-8-GenericCloud-latest.x86_64.qcow2"
 #9 Generic
 test -f $(pwd)/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2 || wget https://mirror.nevacloud.com/almalinux/9/cloud/x86_64/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
-create_template 2052 "temp-almalinux-9-generic" "AlmaLinux-9-GenericCloud-latest.x86_64.qcow2"
+create_template 3052 "temp-almalinux-9-generic" "AlmaLinux-9-GenericCloud-latest.x86_64.qcow2"
 
 ## FreeBSD
 #12.4
 test -f $(pwd)/FreeBSD-12.4-RELEASE-amd64.qcow2 || wget https://mirror.nevacloud.com/freebsd/releases/VM-IMAGES/12.4-RELEASE/amd64/Latest/FreeBSD-12.4-RELEASE-amd64.qcow2.xz || xz -d FreeBSD-12.4-RELEASE-amd64.qcow2.xz
-create_template 2061 "temp-freebsd-12-4" "FreeBSD-12.4-RELEASE-amd64.qcow2"
+create_template 3061 "temp-freebsd-12-4" "FreeBSD-12.4-RELEASE-amd64.qcow2"
 #13.3
 test -f $(pwd)/FreeBSD-13.3-RELEASE-amd64.qcow2 || wget https://mirror.nevacloud.com/freebsd/releases/VM-IMAGES/13.3-RELEASE/amd64/Latest/FreeBSD-13.3-RELEASE-amd64.qcow2.xz || xz -d FreeBSD-13.3-RELEASE-amd64.qcow2.xz
-create_template 2062 "temp-freebsd-13-3" "FreeBSD-13.3-RELEASE-amd64.qcow2"
+create_template 3062 "temp-freebsd-13-3" "FreeBSD-13.3-RELEASE-amd64.qcow2"
 #14.0
 test -f $(pwd)/FreeBSD-14.0-RELEASE-amd64.qcow2 || wget https://mirror.nevacloud.com/freebsd/releases/VM-IMAGES/14.0-RELEASE/amd64/Latest/FreeBSD-14.0-RELEASE-amd64.qcow2.xz || xz -d FreeBSD-14.0-RELEASE-amd64.qcow2.xz
-create_template 2063 "temp-freebsd-14-0" "FreeBSD-14.0-RELEASE-amd64.qcow2"
+create_template 3063 "temp-freebsd-14-0" "FreeBSD-14.0-RELEASE-amd64.qcow2"
 #14.0 ZFS
 test -f $(pwd)/FreeBSD-14.0-RELEASE-amd64-zfs.qcow2 || wget https://mirror.nevacloud.com/freebsd/releases/VM-IMAGES/14.0-RELEASE/amd64/Latest/FreeBSD-14.0-RELEASE-amd64-zfs.qcow2.xz || xz -d FreeBSD-14.0-RELEASE-amd64.qcow2.xz
-create_template 2064 "temp-freebsd-14-0-zfs" "FreeBSD-14.0-RELEASE-amd64-zfs.qcow2"
+create_template 3064 "temp-freebsd-14-0-zfs" "FreeBSD-14.0-RELEASE-amd64-zfs.qcow2"
