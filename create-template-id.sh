@@ -20,7 +20,7 @@ function create_template() {
     #If you are in a cluster, you might need to change cpu type
     qm set $1 --memory ${memory} --cores ${cpu} --cpu host
     #Set boot device to new file
-    qm set $1 --scsi0 ${storage}:0,import-from="$(pwd)/$3",discard=on
+    qm set $1 --scsi0 ${storage}:0,import-from="$(pwd)/$3",discard=on,format=qcow2
     #Set scsi hardware as default boot disk using virtio scsi single
     qm set $1 --boot order=scsi0 --scsihw virtio-scsi-single
     #Enable Qemu guest agent in case the guest has it available
