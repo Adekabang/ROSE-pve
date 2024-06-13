@@ -104,7 +104,7 @@ test -f $(pwd)/CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2 || wget https://
 create_template 3031 "temp-centos-8-stream" "CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2"
 #Stream 9
 test -f $(pwd)/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2 || wget https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2
-create_template 3032 "temp-centos-9-stream-daily" "CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2"
+create_template 3032 "temp-centos-9-stream" "CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2"
 
 ## Rocky Linux
 #8 Generic (Green Obsidian)
