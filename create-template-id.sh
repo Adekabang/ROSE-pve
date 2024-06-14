@@ -123,15 +123,12 @@ test -f $(pwd)/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2 || wget https://mirr
 create_template 3052 "temp-almalinux-9-generic" "AlmaLinux-9-GenericCloud-latest.x86_64.qcow2"
 
 ## FreeBSD
-#12.4
-test -f $(pwd)/FreeBSD-12.4-RELEASE-amd64.qcow2 || (wget https://mirror.nevacloud.com/freebsd/releases/VM-IMAGES/12.4-RELEASE/amd64/Latest/FreeBSD-12.4-RELEASE-amd64.qcow2.xz && xz -d FreeBSD-12.4-RELEASE-amd64.qcow2.xz)
-create_template 3061 "temp-freebsd-12-4" "FreeBSD-12.4-RELEASE-amd64.qcow2"
 #13.3
 test -f $(pwd)/FreeBSD-13.3-RELEASE-amd64.qcow2 || (wget https://mirror.nevacloud.com/freebsd/releases/VM-IMAGES/13.3-RELEASE/amd64/Latest/FreeBSD-13.3-RELEASE-amd64.qcow2.xz && xz -d FreeBSD-13.3-RELEASE-amd64.qcow2.xz)
-create_template 3062 "temp-freebsd-13-3" "FreeBSD-13.3-RELEASE-amd64.qcow2"
+create_template 3061 "temp-freebsd-13-3" "FreeBSD-13.3-RELEASE-amd64.qcow2"
 #14.0
 test -f $(pwd)/FreeBSD-14.0-RELEASE-amd64.qcow2 || (wget https://mirror.nevacloud.com/freebsd/releases/VM-IMAGES/14.0-RELEASE/amd64/Latest/FreeBSD-14.0-RELEASE-amd64.qcow2.xz && xz -d FreeBSD-14.0-RELEASE-amd64.qcow2.xz)
-create_template 3063 "temp-freebsd-14-0" "FreeBSD-14.0-RELEASE-amd64.qcow2"
+create_template 3062 "temp-freebsd-14-0" "FreeBSD-14.0-RELEASE-amd64.qcow2"
 #14.0 ZFS
 test -f $(pwd)/FreeBSD-14.0-RELEASE-amd64-zfs.qcow2 || (wget https://mirror.nevacloud.com/freebsd/releases/VM-IMAGES/14.0-RELEASE/amd64/Latest/FreeBSD-14.0-RELEASE-amd64-zfs.qcow2.xz && xz -d FreeBSD-14.0-RELEASE-amd64.qcow2.xz)
-create_template 3064 "temp-freebsd-14-0-zfs" "FreeBSD-14.0-RELEASE-amd64-zfs.qcow2"
+create_template 3063 "temp-freebsd-14-0-zfs" "FreeBSD-14.0-RELEASE-amd64-zfs.qcow2"
