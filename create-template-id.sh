@@ -133,5 +133,5 @@ create_template 3062 "temp-freebsd-13-3-zfs" "freebsd-13.3-zfs-2024-05-06.qcow2"
 test -f $(pwd)/freebsd-14.0-ufs-2024-05-04.qcow2 || (wget https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.0/2024-05-04/ufs/freebsd-14.0-ufs-2024-05-04.qcow2)
 create_template 3063 "temp-freebsd-14-0-ufs" "freebsd-14.0-ufs-2024-05-04.qcow2"
 #14.0 ZFS
-test -f $(pwd)/freebsd-13.3-zfs-2024-05-06.qcow2 || (wget https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.0/2024-05-06/zfs/freebsd-14.0-zfs-2024-05-06.qcow2)
+test -f $(pwd)/freebsd-14.0-zfs-2024-05-06.qcow2 || (wget https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.0/2024-05-06/zfs/freebsd-14.0-zfs-2024-05-06.qcow2)
 create_template 3064 "temp-freebsd-14-0-zfs" "freebsd-14.0-zfs-2024-05-06.qcow2"
