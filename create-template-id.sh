@@ -124,11 +124,14 @@ create_template 3052 "temp-almalinux-9-generic" "AlmaLinux-9-GenericCloud-latest
 
 ## FreeBSD
 #13.3
-test -f $(pwd)/FreeBSD-13.3-RELEASE-amd64.qcow2 || (wget https://mirror.nevacloud.com/freebsd/releases/VM-IMAGES/13.3-RELEASE/amd64/Latest/FreeBSD-13.3-RELEASE-amd64.qcow2.xz && xz -d FreeBSD-13.3-RELEASE-amd64.qcow2.xz)
-create_template 3061 "temp-freebsd-13-3" "FreeBSD-13.3-RELEASE-amd64.qcow2"
+test -f $(pwd)/freebsd-13.3-ufs-2024-05-06.qcow2 || (wget https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/13.3/2024-05-06/ufs/freebsd-13.3-ufs-2024-05-06.qcow2)
+create_template 3061 "temp-freebsd-13-3-ufs" "freebsd-13.3-ufs-2024-05-06.qcow2"
+#13.3 ZFS
+test -f $(pwd)/freebsd-13.3-zfs-2024-05-06.qcow2 || (wget https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/13.3/2024-05-06/zfs/freebsd-13.3-zfs-2024-05-06.qcow2)
+create_template 3062 "temp-freebsd-13-3-zfs" "freebsd-13.3-zfs-2024-05-06.qcow2"
 #14.0
-test -f $(pwd)/FreeBSD-14.0-RELEASE-amd64.qcow2 || (wget https://mirror.nevacloud.com/freebsd/releases/VM-IMAGES/14.0-RELEASE/amd64/Latest/FreeBSD-14.0-RELEASE-amd64.qcow2.xz && xz -d FreeBSD-14.0-RELEASE-amd64.qcow2.xz)
-create_template 3062 "temp-freebsd-14-0" "FreeBSD-14.0-RELEASE-amd64.qcow2"
+test -f $(pwd)/freebsd-14.0-ufs-2024-05-04.qcow2 || (wget https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.0/2024-05-04/ufs/freebsd-14.0-ufs-2024-05-04.qcow2)
+create_template 3063 "temp-freebsd-14-0-ufs" "freebsd-14.0-ufs-2024-05-04.qcow2"
 #14.0 ZFS
-test -f $(pwd)/FreeBSD-14.0-RELEASE-amd64-zfs.qcow2 || (wget https://mirror.nevacloud.com/freebsd/releases/VM-IMAGES/14.0-RELEASE/amd64/Latest/FreeBSD-14.0-RELEASE-amd64-zfs.qcow2.xz && xz -d FreeBSD-14.0-RELEASE-amd64.qcow2.xz)
-create_template 3063 "temp-freebsd-14-0-zfs" "FreeBSD-14.0-RELEASE-amd64-zfs.qcow2"
+test -f $(pwd)/freebsd-13.3-zfs-2024-05-06.qcow2 || (wget https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.0/2024-05-06/zfs/freebsd-14.0-zfs-2024-05-06.qcow2)
+create_template 3064 "temp-freebsd-14-0-zfs" "freebsd-14.0-zfs-2024-05-06.qcow2"
