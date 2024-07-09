@@ -11,8 +11,9 @@ storage="local"
 network="vmbr1"
 cpu=2
 memory=2048
-base_vmid=4000
+base_vmid=4001
 timezone="Asia/Jakarta"
+nameserver="10.0.1.1 1.1.1.1 8.8.8.8 2606:4700:4700::1001"
 
 # Function to customize image
 customize_image() {
@@ -73,6 +74,7 @@ create_template() {
     qm set $vm_id --sshkeys ${ssh_keyfile}
     qm set $vm_id --cipassword ${password}
     qm set $vm_id --ciuser ${username}
+    qm set $vm_id --nameserver ${nameserver}
 
     # Attempt to resize the disk to 25G
     qm disk resize $vm_id scsi0 25G || echo "Disk already larger than 25G or resize failed"
