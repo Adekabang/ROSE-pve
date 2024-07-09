@@ -113,8 +113,8 @@ declare -A os_templates=(
     ["AlmaLinux 9"]="temp-almalinux-9-generic|https://mirror.nevacloud.com/almalinux/9/cloud/x86_64/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2|AlmaLinux-9-GenericCloud-latest.x86_64.qcow2|alma"
     # ["FreeBSD 13.3 UFS"]="temp-freebsd-13-3-ufs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/13.3/2024-05-06/ufs/freebsd-13.3-ufs-2024-05-06.qcow2|freebsd-13.3-ufs-2024-05-06.qcow2|freebsd"
     # ["FreeBSD 13.3 ZFS"]="temp-freebsd-13-3-zfs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/13.3/2024-05-06/zfs/freebsd-13.3-zfs-2024-05-06.qcow2|freebsd-13.3-zfs-2024-05-06.qcow2|freebsd"
-    ["FreeBSD 14.0 UFS"]="temp-freebsd-14-0-ufs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.0/2024-05-04/ufs/freebsd-14.0-ufs-2024-05-04.qcow2|freebsd-14.0-ufs-2024-05-04.qcow2|freebsd"
-    ["FreeBSD 14.0 ZFS"]="temp-freebsd-14-0-zfs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.0/2024-05-06/zfs/freebsd-14.0-zfs-2024-05-06.qcow2|freebsd-14.0-zfs-2024-05-06.qcow2|freebsd"
+    # ["FreeBSD 14.0 UFS"]="temp-freebsd-14-0-ufs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.0/2024-05-04/ufs/freebsd-14.0-ufs-2024-05-04.qcow2|freebsd-14.0-ufs-2024-05-04.qcow2|freebsd"
+    # ["FreeBSD 14.0 ZFS"]="temp-freebsd-14-0-zfs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.0/2024-05-06/zfs/freebsd-14.0-zfs-2024-05-06.qcow2|freebsd-14.0-zfs-2024-05-06.qcow2|freebsd"
 )
 
 # Main loop to create templates
