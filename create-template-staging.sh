@@ -74,7 +74,7 @@ create_template() {
     qm set $vm_id --sshkeys ${ssh_keyfile}
     qm set $vm_id --cipassword ${password}
     qm set $vm_id --ciuser ${username}
-    qm set $vm_id --nameserver ${nameserver}
+    qm set $vm_id --nameserver "${nameserver}"
 
     # Attempt to resize the disk to 25G
     qm disk resize $vm_id scsi0 25G || echo "Disk already larger than 25G or resize failed"

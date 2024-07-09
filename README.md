@@ -43,7 +43,7 @@ FreeBSD
 * 13.2 ZFS
 * 12.4 ZFS
 ```
-./create-template.sh
+nohup ./create-template.sh &>template.log &
 ```
 
 ## Remove Subscription Message and Change Repo to No Subscription
