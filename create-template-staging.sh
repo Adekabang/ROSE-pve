@@ -12,7 +12,7 @@ network="vmbr1"
 cpu=2
 memory=2048
 base_vmid=4000
-timezone="Europe/London"
+timezone="Asia/Jakarta"
 
 # Function to customize image
 customize_image() {
