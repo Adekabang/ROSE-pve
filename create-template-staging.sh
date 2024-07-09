@@ -36,9 +36,9 @@ customize_image() {
             virt-customize -a "$file_name" --run-command 'sed -i "s/^#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config'
             ;;
         "centos"|"rocky"|"alma")
-            virt-customize -a "$file_name" --install neovim
-            virt-customize -v -a "$file_name" --timezone $timezone
-            virt-customize -v -a "$file_name" --run-command "mv /etc/ssh/sshd_config.d/50-cloud-init.conf /etc/ssh/sshd_config.d/50-cloud-init.conf.disable"
+            virt-customize -a "$file_name" --install wget
+            virt-customize -a "$file_name" --timezone $timezone
+            virt-customize -a "$file_name" --run-command "mv /etc/ssh/sshd_config.d/*.conf /etc/ssh/sshd_config.d/*.conf.disable"
             ### Enable SSH access
             virt-customize -a "$file_name" --run-command 'sed -i -e "s/^#Port 22/Port 22/" -e "s/^#AddressFamily any/AddressFamily any/" -e "s/^#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/" -e "s/^#ListenAddress ::/ListenAddress ::/" /etc/ssh/sshd_config'
             ### Allow PasswordAuthentication
