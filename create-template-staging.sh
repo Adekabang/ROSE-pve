@@ -64,7 +64,7 @@ create_template() {
     # Create new VM with basic configuration
     qm create $vm_id --name $vm_name --ostype l26 
     qm set $vm_id --net0 virtio,bridge=${network}
-    qm set $vm_id --serial0 socket --vga serial0
+    qm set $vm_id --serial0 socket # --vga serial0
     qm set $vm_id --memory ${memory} --cores ${cpu} --cpu host
     qm set $vm_id --scsi0 ${storage}:0,import-from="$(pwd)/$file_name",discard=on,format=qcow2
     qm set $vm_id --boot order=scsi0 --scsihw virtio-scsi-single
