@@ -24,7 +24,7 @@ customize_image() {
 
     case $os_type in
         "debian"|"ubuntu")
-            virt-customize -a "$file_name" --install qemu-guest-agent vim
+            virt-customize -a "$file_name" --install qemu-guest-agent vim neovim
             virt-customize -a "$file_name" --run-command "systemctl enable qemu-guest-agent"
             virt-customize -a "$file_name" --timezone "$timezone"
             virt-customize -a "$file_name" --run-command "mv /etc/ssh/sshd_config.d/60-cloudimg-settings.conf /etc/ssh/sshd_config.d/60-cloudimg-settings.conf.disable"
@@ -36,9 +36,9 @@ customize_image() {
             virt-customize -a "$file_name" --run-command 'sed -i "s/^#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config'
             ;;
         "centos"|"rocky"|"alma")
-            virt-customize -a "$file_name" --run-command "dnf install -y vim"
-            virt-customize -a "$file_name" --timezone "$timezone"
-            virt-customize -a "$file_name" --run-command "mv /etc/ssh/sshd_config.d/50-cloudinit.conf /etc/ssh/sshd_config.d/50-cloudinit.conf.disable"
+            virt-customize -a "$file_name" --run-command "dnf install -y vim neovim"
+            virt-customize -a "$file_name" --timezone $timezone
+            virt-customize -a "$file_name" --run-command "mv /etc/ssh/sshd_config.d/50-cloud-init.conf /etc/ssh/sshd_config.d/50-cloud-init.conf.disable"
             ### Enable SSH access
             virt-customize -a "$file_name" --run-command 'sed -i -e "s/^#Port 22/Port 22/" -e "s/^#AddressFamily any/AddressFamily any/" -e "s/^#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/" -e "s/^#ListenAddress ::/ListenAddress ::/" /etc/ssh/sshd_config'
             ### Allow PasswordAuthentication
