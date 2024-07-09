@@ -24,7 +24,7 @@ customize_image() {
 
     case $os_type in
         "debian"|"ubuntu")
-            virt-customize -a "$file_name" --install qemu-guest-agent
+            virt-customize -a "$file_name" --install [qemu-guest-agent,neovim]
             virt-customize -a "$file_name" --run-command "systemctl enable qemu-guest-agent"
             virt-customize -a "$file_name" --timezone "$timezone"
             virt-customize -a "$file_name" --run-command "mv /etc/ssh/sshd_config.d/60-cloudimg-settings.conf /etc/ssh/sshd_config.d/60-cloudimg-settings.conf.disable"
