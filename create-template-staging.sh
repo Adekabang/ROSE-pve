@@ -41,6 +41,7 @@ customize_image() {
             # virt-customize -a "$file_name" --run-command 'sed -i "" "s/^PasswordAuthentication.*/PasswordAuthentication yes/" /etc/ssh/sshd_config'
             # virt-customize -a "$file_name" --run-command 'sed -i "" "s/^#PermitRootLogin.*/PermitRootLogin prohibit-password/" /etc/ssh/sshd_config'
             # ;;
+            echo "FreeBSD. Skipping customization."
         *)
             echo "Unknown OS type: $os_type. Skipping customization."
             ;;
