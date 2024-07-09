@@ -36,8 +36,6 @@ customize_image() {
             virt-customize -a "$file_name" --run-command 'sed -i "s/^#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config'
             ;;
         "centos"|"rocky"|"alma")
-            virt-customize -a "$file_name" --install qemu-guest-agent
-            virt-customize -a "$file_name" --run-command "systemctl enable qemu-guest-agent"
             virt-customize -a "$file_name" --timezone $timezone
             virt-customize -a "$file_name" --run-command "mv /etc/ssh/sshd_config.d/50-cloud-init.conf /etc/ssh/sshd_config.d/50-cloud-init.conf.disable"
             ### Enable SSH access
