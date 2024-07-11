@@ -37,8 +37,7 @@ customize_image() {
             ;;
         "centos"|"rocky"|"alma")
             virt-customize -a "$file_name" --install wget
-            virt-customize -a "$file_name" --run-command "restorecon -Rv /etc"
-            virt-customize -a "$file_name" --timezone $timezone
+            virt-customize -a "$file_name" --selinux-relabel --timezone $timezone
             virt-customize -a "$file_name" --run-command "rm -r /etc/ssh/sshd_config.d/"
             ### Enable SSH access
             virt-customize -a "$file_name" --run-command 'sed -i -e "s/^#Port 22/Port 22/" -e "s/^#AddressFamily any/AddressFamily any/" -e "s/^#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/" -e "s/^#ListenAddress ::/ListenAddress ::/" /etc/ssh/sshd_config'
