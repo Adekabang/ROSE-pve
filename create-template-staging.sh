@@ -22,6 +22,9 @@ customize_image() {
 
     echo "Customizing image for $os_type"
 
+    # Temporary copy from original
+    cp ~/os-images/$file_name ~/ROSE-pve 
+
     case $os_type in
         "debian"|"ubuntu")
             virt-customize -a "$file_name" --install qemu-guest-agent
@@ -44,7 +47,7 @@ customize_image() {
             virt-customize -a "$file_name" --run-command 'sed -i -e "s/^#Port 22/Port 22/" -e "s/^#AddressFamily any/AddressFamily any/" -e "s/^#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/" -e "s/^#ListenAddress ::/ListenAddress ::/" /etc/ssh/sshd_config'
             ### Allow PasswordAuthentication
             virt-customize -a "$file_name" --run-command 'sed -i "/^#PasswordAuthentication[[:space:]]/cPasswordAuthentication yes" /etc/ssh/sshd_config && sed -i "/^PasswordAuthentication no/cPasswordAuthentication yes" /etc/ssh/sshd_config'
-            virt-customize -a "$file_name" --run-command 'sed -i "/^#PasswordAuthentication[[:space:]]/cPasswordAuthentication yes" /etc/ssh/sshd_config && sed -i "/^PasswordAuthentication no/cPasswordAuthentication yes" /etc/ssh/sshd_config'
+            virt-customize -a "$file_name" --run-command 'sed -i "/^PasswordAuthentication no/cPasswordAuthentication yes" /etc/ssh/sshd_config'
             ### Enable root SSH login
             virt-customize -a "$file_name" --run-command 'sed -i "s/^#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config'
             ;;
@@ -131,6 +134,7 @@ for os_name in "${!os_templates[@]}"; do
     if [[ ! -f "$file_name" ]]; then
         echo "Downloading $file_name"
         wget "$image_url" -O "$file_name"
+    
     fi
     
     # Create template
