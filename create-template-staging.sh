@@ -46,9 +46,10 @@ customize_image() {
             ### Enable SSH access
             virt-customize -a "$file_name" --run-command 'sed -i -e "s/^#Port 22/Port 22/" -e "s/^#AddressFamily any/AddressFamily any/" -e "s/^#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/" -e "s/^#ListenAddress ::/ListenAddress ::/" /etc/ssh/sshd_config'
             ### Allow PasswordAuthentication
-            virt-customize -a "$file_name" --run-command 'cat /etc/ssh/sshd_config | grep PasswordAuthentication'
             virt-customize -a "$file_name" --run-command 'sed -i "/^#PasswordAuthentication[[:space:]]/cPasswordAuthentication yes" /etc/ssh/sshd_config && sed -i "/^PasswordAuthentication no/cPasswordAuthentication yes" /etc/ssh/sshd_config'
-            virt-customize -a "$file_name" --run-command 'cat /etc/ssh/sshd_config | grep PasswordAuthentication'
+            virt-customize -a "$file_name" --run-command 'sed -i "/^Include \/etc\/ssh\/sshd_config.d\/\*\.conf/!s/^/Include \/etc\/ssh\/sshd_config.d\/\*\.conf\n/" "/etc/ssh/sshd_config"
+'
+            
             ### Enable root SSH login
             virt-customize -a "$file_name" --run-command 'sed -i "s/^#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config'
             ;;
