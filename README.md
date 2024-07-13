@@ -20,30 +20,29 @@ Debian
 * Buster (10)
 * Bullseye (11)
 * Bookworm (12)
-* Sid (Unstable)
 
 Ubuntu
 * 20.04 (Focal Fossa)
 * 22.04 (Jammy Jellyfish)
-* 23.04 (Lunar Lobster) - daily builds
-
-Fedora 
-* 37
-* 38
+* 24.04 (Noble Numbat)
 
 CentOS Stream
 * Stream 8
-* Stream 9 (daily)
+* Stream 9
 
 Rocky Linux
 * 8 Generic (Green Obsidian)
 * 9 Generic (Blue Onyx)
 
+Alma Linux
+* 8 Generic
+* 9 Generic
+
 FreeBSD
 * 13.2 ZFS
 * 12.4 ZFS
 ```
-nohup ./create-template.sh &>template.log &
+nohup ./create-template-id.sh &>template.log &
 ```
 
 ## Remove Subscription Message and Change Repo to No Subscription
