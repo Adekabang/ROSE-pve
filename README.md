@@ -39,8 +39,10 @@ Alma Linux
 * 9 Generic
 
 FreeBSD
-* 13.2 ZFS
-* 12.4 ZFS
+* 13.3 UFS
+* 13.3 ZFS
+* 14.0 UFS
+* 14.0 ZFS
 ```
 nohup ./create-template-id.sh &>template.log &
 ```
