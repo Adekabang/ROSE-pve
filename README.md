@@ -49,7 +49,7 @@ nohup ./create-template-id.sh &>template.log &
 
 ## Download VM Template 
 ```bash
-nohup ./create-template-id.sh &>template.log &
+nohup ./download-only.sh &>template.log &
 ```
 
 ## Remove Subscription Message and Change Repo to No Subscription
