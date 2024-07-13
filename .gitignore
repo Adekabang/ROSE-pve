@@ -1,3 +1,4 @@
 *.xz
 *.img
 *.qcow2
+/os-images

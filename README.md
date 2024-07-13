@@ -47,6 +47,11 @@ FreeBSD
 nohup ./create-template-id.sh &>template.log &
 ```
 
+## Download VM Template 
+```bash
+nohup ./create-template-id.sh &>template.log &
+```
+
 ## Remove Subscription Message and Change Repo to No Subscription
 Tested on Debian 11 & 12 based PVE
 ```

@@ -23,7 +23,7 @@ customize_image() {
     echo "Customizing image for $os_type"
 
     # Temporary copy from original
-    # cp ~/os-images/$file_name ~/ROSE-pve 
+    # cp os-images/$file_name ~/ROSE-pve 
 
     case $os_type in
         "debian"|"ubuntu")
