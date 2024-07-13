@@ -1,137 +1,181 @@
 #!/bin/bash
 
-#Create template
-#args:
-# vm_id
-# vm_name
-# file name in the current directory
-function create_template() {
-    #Print all of the configuration
-    echo "Creating template $2 ($1)"
+# VM Template Creation Script
+# This script creates VM templates for various operating systems in Proxmox
 
-    #Create new VM 
-    #Feel free to change any of these to your liking
-    qm create $1 --name $2 --ostype l26 
-    #Set networking to default bridge
-    qm set $1 --net0 virtio,bridge=${network}
-    #Set display to serial
-    qm set $1 --serial0 socket --vga serial0
-    #Set memory, cpu, type defaults
-    #If you are in a cluster, you might need to change cpu type
-    qm set $1 --memory ${memory} --cores ${cpu} --cpu host
-    #Set boot device to new file
-    qm set $1 --scsi0 ${storage}:0,import-from="$(pwd)/$3",discard=on,format=qcow2
-    #Set scsi hardware as default boot disk using virtio scsi single
-    qm set $1 --boot order=scsi0 --scsihw virtio-scsi-single
-    #Enable Qemu guest agent in case the guest has it available
-    qm set $1 --agent enabled=1,fstrim_cloned_disks=1
-    #Add cloud-init device
-    qm set $1 --ide2 ${storage}:cloudinit
-    #Set CI ip config
-    #IP6 = auto means SLAAC (a reliable default with no bad effects on non-IPv6 networks)
-    #IP = DHCP means what it says, so leave that out entirely on non-IPv4 networks to avoid DHCP delays
-    qm set $1 --ipconfig0 "ip6=auto,ip=dhcp"
-    #Import the ssh keyfile
-    qm set $1 --sshkeys ${ssh_keyfile}
-    #If you want to do password-based auth instaed
-    #Then use this option and comment out the line above
-    qm set $1 --cipassword ${password}
-    #Add the user
-    qm set $1 --ciuser ${username}
-    #Resize the disk to 25G, a reasonable minimum. You can expand it more later.
-    #If the disk is already bigger than 25G, this will fail, and that is okay.
-    qm disk resize $1 scsi0 25G
-    #Make it a template
-    qm template $1
+# Configuration
+ssh_keyfile="/root/.ssh/authorized_keys"
+username="root"
+password="password"
+storage="local"
+network="vmbr1"
+cpu=2
+memory=2048
+base_vmid=4001
+timezone="Asia/Jakarta"
+nameserver="10.0.1.1 1.1.1.1 8.8.8.8 2606:4700:4700::1001"
 
-    #Remove file when done
-    # rm $3
+# Function to customize image
+customize_image() {
+    local file_name=$1
+    local os_type=$2
 
-    echo ""
-    echo "#######  #######  #######  #######  #######  #######  #######  #######  #######  #######  #######  #######  #######  #######  #######  #######  #######"
-    echo ""
+    echo "Customizing image for $os_type"
+
+    # Temporary copy from original
+    # cp ~/os-images/$file_name ~/ROSE-pve 
+
+    case $os_type in
+        "debian"|"ubuntu")
+            virt-customize -a "$file_name" --install qemu-guest-agent,vim,wget
+            virt-customize -a "$file_name" --run-command "systemctl enable qemu-guest-agent"
+            virt-customize -a "$file_name" --timezone "$timezone"
+            virt-customize -a "$file_name" --run-command "mv /etc/ssh/sshd_config.d/60-cloudimg-settings.conf /etc/ssh/sshd_config.d/60-cloudimg-settings.conf.disable"
+            ### Enable SSH access
+            virt-customize -a "$file_name" --run-command 'sed -i -e "s/^#Port 22/Port 22/" -e "s/^#AddressFamily any/AddressFamily any/" -e "s/^#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/" -e "s/^#ListenAddress ::/ListenAddress ::/" /etc/ssh/sshd_config'
+            ### Allow PasswordAuthentication
+            virt-customize -a "$file_name" --run-command 'sed -i "/^#PasswordAuthentication[[:space:]]/cPasswordAuthentication yes" /etc/ssh/sshd_config && sed -i "/^PasswordAuthentication no/cPasswordAuthentication yes" /etc/ssh/sshd_config'
+            ### Enable root SSH login
+            virt-customize -a "$file_name" --run-command 'sed -i "s/^#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config'
+            ;;
+        "centos"|"rocky"|"alma")
+            virt-customize -a "$file_name" --install vim,wget
+            virt-customize -a "$file_name" --selinux-relabel --timezone $timezone
+            virt-customize -a "$file_name" --run-command "mkdir -p /etc/ssh/sshd_config.d/ && touch /etc/ssh/sshd_config.d/01-allow-password-auth.conf "
+            ### Enable SSH access
+            virt-customize -a "$file_name" --run-command 'sed -i -e "s/^#Port 22/Port 22/" -e "s/^#AddressFamily any/AddressFamily any/" -e "s/^#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/" -e "s/^#ListenAddress ::/ListenAddress ::/" /etc/ssh/sshd_config'
+            ### Allow PasswordAuthentication
+            virt-customize -a "$file_name" --run-command "echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config.d/01-allow-password-auth.conf"
+            ### Enable root SSH login
+            virt-customize -a "$file_name" --run-command 'sed -i "s/^#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config'
+            ;;
+        "centos8")
+            ### Fix yum repository
+            virt-customize -a "$file_name" --run-command "sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*"
+            virt-customize -a "$file_name" --run-command "sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*"
+            virt-customize -a "$file_name" --install vim,wget
+            virt-customize -a "$file_name" --selinux-relabel --timezone $timezone
+            virt-customize -a "$file_name" --run-command "mkdir -p /etc/ssh/sshd_config.d/ && touch /etc/ssh/sshd_config.d/01-allow-password-auth.conf "
+            ### Enable SSH access
+            virt-customize -a "$file_name" --run-command 'sed -i -e "s/^#Port 22/Port 22/" -e "s/^#AddressFamily any/AddressFamily any/" -e "s/^#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/" -e "s/^#ListenAddress ::/ListenAddress ::/" /etc/ssh/sshd_config'
+            ### Allow PasswordAuthentication
+            virt-customize -a "$file_name" --run-command 'sed -i "1iInclude /etc/ssh/sshd_config.d/*.conf" /etc/ssh/sshd_config'
+            virt-customize -a "$file_name" --run-command "echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config.d/01-allow-password-auth.conf"
+            ### Enable root SSH login
+            virt-customize -a "$file_name" --run-command 'sed -i "s/^#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config'
+            ;;
+        "rocky8"|"alma8")
+            virt-customize -a "$file_name" --install vim,wget
+            virt-customize -a "$file_name" --selinux-relabel --timezone $timezone
+            virt-customize -a "$file_name" --run-command "mkdir -p /etc/ssh/sshd_config.d/ && touch /etc/ssh/sshd_config.d/01-allow-password-auth.conf "
+            ### Enable SSH access
+            virt-customize -a "$file_name" --run-command 'sed -i -e "s/^#Port 22/Port 22/" -e "s/^#AddressFamily any/AddressFamily any/" -e "s/^#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/" -e "s/^#ListenAddress ::/ListenAddress ::/" /etc/ssh/sshd_config'
+            ### Allow PasswordAuthentication
+            virt-customize -a "$file_name" --run-command 'sed -i "1iInclude /etc/ssh/sshd_config.d/*.conf" /etc/ssh/sshd_config'
+            virt-customize -a "$file_name" --run-command "echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config.d/01-allow-password-auth.conf"
+            ### Enable root SSH login
+            virt-customize -a "$file_name" --run-command 'sed -i "s/^#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config'
+            ;;
+        "freebsd")
+            # FreeBSD uses a different package manager and might have different paths
+            echo "FreeBSD. Skipping customization."
+            ;;
+        *)
+            echo "Unknown OS type: $os_type. Skipping customization."
+            ;;
+    esac
 }
 
+# Function to create a template
+create_template() {
+    local vm_id=$1
+    local vm_name=$2
+    local file_name=$3
+    local os_type=$4
 
-#Path to your ssh authorized_keys file
-#Alternatively, use /etc/pve/priv/authorized_keys if you are already authorized
-#on the Proxmox system
-export ssh_keyfile=/root/.ssh/authorized_keys
-#Username to create on VM template
-export username=root
-#Set password on VM template
-export password=password
+    echo "Creating template $vm_name ($vm_id)"
 
-#Name of your storage
-export storage=local
+    # Customize the image before creating the VM
+    customize_image "$file_name" "$os_type"
 
-#Name of your network interface
-export network=vmbr1
+    # Create new VM with basic configuration
+    qm create $vm_id --name $vm_name --ostype l26 
+    qm set $vm_id --net0 virtio,bridge=${network}
+    qm set $vm_id --serial0 socket # --vga serial0
+    qm set $vm_id --memory ${memory} --cores ${cpu} --cpu host
+    qm set $vm_id --scsi0 ${storage}:0,import-from="$(pwd)/$file_name",discard=on,format=qcow2
+    qm set $vm_id --boot order=scsi0 --scsihw virtio-scsi-single
+    qm set $vm_id --agent enabled=1,fstrim_cloned_disks=1
+    qm set $vm_id --ide2 ${storage}:cloudinit
+    qm set $vm_id --ipconfig0 "ip6=auto,ip=dhcp"
+    qm set $vm_id --sshkeys ${ssh_keyfile}
+    qm set $vm_id --cipassword ${password}
+    qm set $vm_id --ciuser ${username}
+    qm set $vm_id --nameserver "${nameserver}"
 
-#Set CPU and memory on VM template
-export cpu=2
-export memory=2048
+    # Attempt to resize the disk to 25G
+    qm disk resize $vm_id scsi0 25G || echo "Disk already larger than 25G or resize failed"
 
-#The images that I've found premade
-#Feel free to add your own
+    # Convert to template
+    qm template $vm_id
 
-## Debian
-#Buster (10)
-test -f $(pwd)/debian-10-genericcloud-amd64.qcow2 || wget "https://cloud.debian.org/images/cloud/buster/latest/debian-10-genericcloud-amd64.qcow2"
-create_template 3001 "temp-debian-10" "debian-10-genericcloud-amd64.qcow2"
-#Bullseye (11)
-test -f $(pwd)/debian-11-genericcloud-amd64.qcow2 || wget "https://cloud.debian.org/images/cloud/bullseye/latest/debian-11-genericcloud-amd64.qcow2"
-create_template 3002 "temp-debian-11" "debian-11-genericcloud-amd64.qcow2" 
-#Bookworm (12)
-test -f $(pwd)/debian-12-genericcloud-amd64.qcow2 || wget "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
-create_template 3003 "temp-debian-12" "debian-12-genericcloud-amd64.qcow2"
+    echo "Template $vm_name created successfully"
+    echo "------------------------------------"
+}
 
-## Ubuntu
-#20.04 (Focal Fossa)
-test -f $(pwd)/ubuntu-20.04-server-cloudimg-amd64.img || wget "https://cloud-images.ubuntu.com/releases/20.04/release/ubuntu-20.04-server-cloudimg-amd64.img"
-create_template 3011 "temp-ubuntu-20-04" "ubuntu-20.04-server-cloudimg-amd64.img" 
-#22.04 (Jammy Jellyfish)
-test -f $(pwd)/ubuntu-22.04-server-cloudimg-amd64.img || wget "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
-create_template 3012 "temp-ubuntu-22-04" "ubuntu-22.04-server-cloudimg-amd64.img" 
-#24.04 (Noble Numbat)
-test -f $(pwd)/ubuntu-24.04-server-cloudimg-amd64.img || wget "https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img"
-create_template 3013 "temp-ubuntu-24-04" "ubuntu-24.04-server-cloudimg-amd64.img" 
+find_next_available_vmid() {
+    local start_id=$1
+    local current_id=$start_id
+    
+    while qm status $current_id &>/dev/null; do
+        ((current_id++))
+    done
+    
+    echo $current_id
+}
 
+# Define OS templates
+# Format: OS_Name, Template_Name, Image_URL, File_Name, OS_Type
+declare -A os_templates=(
+    ["Debian 10"]="temp-debian-10|https://cloud.debian.org/images/cloud/buster/latest/debian-10-genericcloud-amd64.qcow2|debian-10-genericcloud-amd64.qcow2|debian"
+    ["Debian 11"]="temp-debian-11|https://cloud.debian.org/images/cloud/bullseye/latest/debian-11-genericcloud-amd64.qcow2|debian-11-genericcloud-amd64.qcow2|debian"
+    ["Debian 12"]="temp-debian-12|https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2|debian-12-genericcloud-amd64.qcow2|debian"
+    ["Ubuntu 20.04"]="temp-ubuntu-20-04|https://cloud-images.ubuntu.com/releases/20.04/release/ubuntu-20.04-server-cloudimg-amd64.img|ubuntu-20.04-server-cloudimg-amd64.img|ubuntu"
+    ["Ubuntu 22.04"]="temp-ubuntu-22-04|https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img|ubuntu-22.04-server-cloudimg-amd64.img|ubuntu"
+    ["Ubuntu 24.04"]="temp-ubuntu-24-04|https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img|ubuntu-24.04-server-cloudimg-amd64.img|ubuntu"
+    ["CentOS Stream 8"]="temp-centos-8-stream|https://cloud.centos.org/centos/8-stream/x86_64/images/CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2|CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2|centos8"
+    ["CentOS Stream 9"]="temp-centos-9-stream|https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2|CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2|centos"
+    ["Rocky Linux 8"]="temp-rocky-linux-8-generic|https://mirror.nevacloud.com/rockylinux/8/images/x86_64/Rocky-8-GenericCloud-Base.latest.x86_64.qcow2|Rocky-8-GenericCloud-Base.latest.x86_64.qcow2|rocky8"
+    ["Rocky Linux 9"]="temp-rocky-linux-9-generic|https://mirror.nevacloud.com/rockylinux/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2|Rocky-9-GenericCloud-Base.latest.x86_64.qcow2|rocky"
+    ["AlmaLinux 8"]="temp-almalinux-8-generic|https://mirror.nevacloud.com/almalinux/8/cloud/x86_64/images/AlmaLinux-8-GenericCloud-latest.x86_64.qcow2|AlmaLinux-8-GenericCloud-latest.x86_64.qcow2|alma8"
+    ["AlmaLinux 9"]="temp-almalinux-9-generic|https://mirror.nevacloud.com/almalinux/9/cloud/x86_64/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2|AlmaLinux-9-GenericCloud-latest.x86_64.qcow2|alma"
+    ["FreeBSD 13.3 UFS"]="temp-freebsd-13-3-ufs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/13.3/2024-05-06/ufs/freebsd-13.3-ufs-2024-05-06.qcow2|freebsd-13.3-ufs-2024-05-06.qcow2|freebsd"
+    ["FreeBSD 13.3 ZFS"]="temp-freebsd-13-3-zfs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/13.3/2024-05-06/zfs/freebsd-13.3-zfs-2024-05-06.qcow2|freebsd-13.3-zfs-2024-05-06.qcow2|freebsd"
+    ["FreeBSD 14.0 UFS"]="temp-freebsd-14-0-ufs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.0/2024-05-04/ufs/freebsd-14.0-ufs-2024-05-04.qcow2|freebsd-14.0-ufs-2024-05-04.qcow2|freebsd"
+    ["FreeBSD 14.0 ZFS"]="temp-freebsd-14-0-zfs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.0/2024-05-06/zfs/freebsd-14.0-zfs-2024-05-06.qcow2|freebsd-14.0-zfs-2024-05-06.qcow2|freebsd"
+)
 
-## CentOS Stream
-#Stream 8
-test -f $(pwd)/CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2 || wget https://cloud.centos.org/centos/8-stream/x86_64/images/CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2
-create_template 3031 "temp-centos-8-stream" "CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2"
-#Stream 9
-test -f $(pwd)/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2 || wget https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2
-create_template 3032 "temp-centos-9-stream" "CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2"
+# Main loop to create templates
+vmid=$base_vmid
+for os_name in "${!os_templates[@]}"; do
+    IFS='|' read -r template_name image_url file_name os_type <<< "${os_templates[$os_name]}"
+    
+    echo "Processing $os_name"
+    
+    # Find the next available VM ID
+    vmid=$(find_next_available_vmid $vmid)
+    echo "Using VM ID: $vmid"
+    
+    # Download image if not present
+    if [[ ! -f "$file_name" ]]; then
+        echo "Downloading $file_name"
+        wget "$image_url" -O "$file_name"
+    fi
+    
+    # Create template
+    create_template $vmid "$template_name" "$file_name" "$os_type"
+    
+    ((vmid++))
+done
 
-## Rocky Linux
-#8 Generic (Green Obsidian)
-test -f $(pwd)/Rocky-8-GenericCloud-Base.latest.x86_64.qcow2 || wget https://mirror.nevacloud.com/rockylinux/8/images/x86_64/Rocky-8-GenericCloud-Base.latest.x86_64.qcow2
-create_template 3041 "temp-rocky-linux-8-generic" "Rocky-8-GenericCloud-Base.latest.x86_64.qcow2"
-#9 Generic (Blue Onyx)
-test -f $(pwd)/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2 || wget https://mirror.nevacloud.com/rockylinux/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2
-create_template 3042 "temp-rocky-linux-9-generic" "Rocky-9-GenericCloud-Base.latest.x86_64.qcow2"
-
-## Alma Linux
-#8 Generic 
-test -f $(pwd)/AlmaLinux-8-GenericCloud-latest.x86_64.qcow2 || wget https://mirror.nevacloud.com/almalinux/8/cloud/x86_64/images/AlmaLinux-8-GenericCloud-latest.x86_64.qcow2
-create_template 3051 "temp-almalinux-8-generic" "AlmaLinux-8-GenericCloud-latest.x86_64.qcow2"
-#9 Generic
-test -f $(pwd)/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2 || wget https://mirror.nevacloud.com/almalinux/9/cloud/x86_64/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
-create_template 3052 "temp-almalinux-9-generic" "AlmaLinux-9-GenericCloud-latest.x86_64.qcow2"
-
-## FreeBSD
-#13.3
-test -f $(pwd)/freebsd-13.3-ufs-2024-05-06.qcow2 || (wget https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/13.3/2024-05-06/ufs/freebsd-13.3-ufs-2024-05-06.qcow2)
-create_template 3061 "temp-freebsd-13-3-ufs" "freebsd-13.3-ufs-2024-05-06.qcow2"
-#13.3 ZFS
-test -f $(pwd)/freebsd-13.3-zfs-2024-05-06.qcow2 || (wget https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/13.3/2024-05-06/zfs/freebsd-13.3-zfs-2024-05-06.qcow2)
-create_template 3062 "temp-freebsd-13-3-zfs" "freebsd-13.3-zfs-2024-05-06.qcow2"
-#14.0
-test -f $(pwd)/freebsd-14.0-ufs-2024-05-04.qcow2 || (wget https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.0/2024-05-04/ufs/freebsd-14.0-ufs-2024-05-04.qcow2)
-create_template 3063 "temp-freebsd-14-0-ufs" "freebsd-14.0-ufs-2024-05-04.qcow2"
-#14.0 ZFS
-test -f $(pwd)/freebsd-14.0-zfs-2024-05-06.qcow2 || (wget https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.0/2024-05-06/zfs/freebsd-14.0-zfs-2024-05-06.qcow2)
-create_template 3064 "temp-freebsd-14-0-zfs" "freebsd-14.0-zfs-2024-05-06.qcow2"
+echo "All templates created successfully!"
