@@ -123,6 +123,17 @@ create_template() {
     echo "------------------------------------"
 }
 
+find_next_available_vmid() {
+    local start_id=$1
+    local current_id=$start_id
+    
+    while qm status $current_id &>/dev/null; do
+        ((current_id++))
+    done
+    
+    echo $current_id
+}
+
 # Define OS templates
 # Format: OS_Name, Template_Name, Image_URL, File_Name, OS_Type
 declare -A os_templates=(
@@ -151,11 +162,14 @@ for os_name in "${!os_templates[@]}"; do
     
     echo "Processing $os_name"
     
+    # Find the next available VM ID
+    vmid=$(find_next_available_vmid $vmid)
+    echo "Using VM ID: $vmid"
+    
     # Download image if not present
     if [[ ! -f "$file_name" ]]; then
         echo "Downloading $file_name"
         wget "$image_url" -O "$file_name"
-    
     fi
     
     # Create template
