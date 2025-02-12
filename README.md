@@ -3,6 +3,8 @@
 ```sh
 apt update -y
 apt install git vim -y
+# for template creation
+apt install libguestfs-tools -y
 ```
 
 ## Theme Installation
