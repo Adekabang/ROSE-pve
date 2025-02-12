@@ -41,10 +41,10 @@ Alma Linux
 * 9 Generic
 
 FreeBSD
-* 13.3 UFS
-* 13.3 ZFS
-* 14.0 UFS
-* 14.0 ZFS
+* 13.4 UFS
+* 13.4 ZFS
+* 14.2 UFS
+* 14.2 ZFS
 ```
 nohup ./create-template-id.sh &>template.log &
 ```
@@ -52,6 +52,11 @@ nohup ./create-template-id.sh &>template.log &
 ## Download VM Template 
 ```bash
 nohup ./download-only.sh &>download.log &
+```
+
+## Staging Create Template
+```bash
+nohup ./create-template-staging.sh &>template.log &
 ```
 
 ## Remove Subscription Message and Change Repo to No Subscription

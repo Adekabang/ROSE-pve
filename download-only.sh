@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set the directory for storing OS images
-IMAGE_DIR="os-images"
+IMAGE_DIR="~/os-images"
 
 # Create the directory if it doesn't exist
 mkdir -p "$IMAGE_DIR"
