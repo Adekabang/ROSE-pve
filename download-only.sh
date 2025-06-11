@@ -29,6 +29,9 @@ declare -A os_templates=(
     ["FreeBSD 13.4 ZFS"]="temp-freebsd-13-4-zfs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/13.4/2024-10-28/zfs/freebsd-13.4-zfs-2024-10-28.qcow2|freebsd-13.4-zfs-2024-10-28.qcow2|freebsd"
     ["FreeBSD 14.2 UFS"]="temp-freebsd-14-2-ufs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.2/2024-12-08/ufs/freebsd-14.2-ufs-2024-12-08.qcow2|freebsd-14.2-ufs-2024-12-08.qcow2|freebsd"
     ["FreeBSD 14.2 ZFS"]="temp-freebsd-14-2-zfs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.2/2024-12-08/zfs/freebsd-14.2-zfs-2024-12-08.qcow2|freebsd-14.2-zfs-2024-12-08.qcow2|freebsd"
+    ["Windows Server 2019 Standard"]="temp-windows-server-2019-standard|https://os-cdn.virtfusion.net/windows/windows-server-2019-standard-virtfusion.qcow2|windows-server-2019-standard-virtfusion.qcow2|windows"
+    ["Windows Server 2022 Standard"]="temp-windows-server-2022-standard|https://os-cdn.virtfusion.net/windows/windows-server-2022-standard-virtfusion.qcow2|windows-server-2022-standard-virtfusion.qcow2|windows"
+    ["Windows Server 2025 Standard"]="temp-windows-server-2025-standard|https://os-cdn.virtfusion.net/windows/windows-server-2025-standard-virtfusion.qcow2|windows-server-2025-standard-virtfusion.qcow2|windows"
 )
 
 # Function to download images
