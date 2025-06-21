@@ -1,114 +1,191 @@
-## Pre-Installation
+# ROSE-pve: Proxmox VE Enhancement Tools
 
-```sh
+A collection of tools for Proxmox VE administration, featuring a powerful template manager and customization utilities.
+
+## Features
+
+### Template Manager
+- Download and create VM templates from cloud images
+- Support for multiple operating systems:
+  - Debian (10 Buster, 11 Bullseye, 12 Bookworm)
+  - Ubuntu (20.04 Focal Fossa, 22.04 Jammy Jellyfish, 24.04 Noble Numbat)
+  - CentOS Stream (8, 9, 10)
+  - Rocky Linux (8 Green Obsidian, 9 Blue Onyx, 10)
+  - AlmaLinux (8, 9, 10)
+  - FreeBSD (13.4, 14.2 with UFS/ZFS options)
+  - Windows Server (2019, 2022, 2025) Standard editions
+- Cloud-init/Cloudbase-Init support for all templates
+- Group operations (download/create all templates for an OS)
+- Indonesian mirror support for faster downloads
+- Customizable configuration
+- Detailed progress tracking and error reporting
+
+### Customization Tools
+- Proxmox theme customization
+- Subscription message removal
+- Repository configuration for no-subscription usage
+- Storage management utilities
+
+## Pre-Installation Requirements
+
+1. Update system and install required packages:
+```bash
 apt update -y
-apt install git vim -y
-# for template creation
-apt install libguestfs-tools -y
+apt install git vim libguestfs-tools jq wget sudo -y
 ```
 
-## Theme Installation
-```
+2. Clone the repository:
+```bash
 git clone https://github.com/Adekabang/ROSE-pve.git
 cd ROSE-pve
+```
 
+## Template Manager Usage
+
+### Basic Setup
+
+1. Make the script executable:
+```bash
+chmod +x template-manager.sh
+```
+
+2. Configure your settings (optional):
+```bash
+cp config.conf.example config.conf
+vim config.conf
+```
+
+### Available Commands
+
+```bash
+# List all available templates
+./template-manager.sh list
+
+# List templates for a specific OS
+./template-manager.sh list debian
+
+# Show available OS groups
+./template-manager.sh groups
+
+# Download a specific template
+./template-manager.sh download debian 12
+
+# Create a template
+./template-manager.sh create ubuntu 22.04
+
+# Download all templates for an OS
+./template-manager.sh download-group debian
+
+# Create all templates for an OS
+./template-manager.sh create-group ubuntu
+
+# Use Indonesian mirrors
+./template-manager.sh --templates os-templates-id.json download debian 12
+```
+
+### Configuration Options
+
+Edit `config.conf` to customize your template settings:
+
+```bash
+# SSH and Authentication
+SSH_KEYFILE="/root/.ssh/authorized_keys"  # Path to SSH authorized keys
+USERNAME="root"                           # Default template user
+PASSWORD="password"                       # Default template password
+
+# Proxmox Settings
+STORAGE="local"                          # Storage location for templates
+NETWORK="vmbr1"                          # Network bridge
+CPU=1                                    # Number of CPU cores
+MEMORY=512                               # Memory in MB
+BASE_VMID=4001                          # Starting VMID for templates
+
+# System Settings
+TIMEZONE="Asia/Jakarta"                  # Default timezone
+NAMESERVER="1.1.1.1 8.8.8.8"            # DNS servers
+```
+
+## Theme Customization
+
+Apply custom themes to your Proxmox interface:
+```bash
 cd theme-xxx
 ./changelogo.sh
 ```
 
-## Create VM Template 
-Available Template(s):
-Debian
-* Buster (10)
-* Bullseye (11)
-* Bookworm (12)
+## System Administration
 
-Ubuntu
-* 20.04 (Focal Fossa)
-* 22.04 (Jammy Jellyfish)
-* 24.04 (Noble Numbat)
-
-CentOS Stream
-* Stream 8
-* Stream 9
-
-Rocky Linux
-* 8 Generic (Green Obsidian)
-* 9 Generic (Blue Onyx)
-
-Alma Linux
-* 8 Generic
-* 9 Generic
-
-FreeBSD
-* 13.4 UFS
-* 13.4 ZFS
-* 14.2 UFS
-* 14.2 ZFS
-```
-nohup ./create-template-id.sh &>template.log &
-```
-
-## Download VM Template 
+### Remove Subscription Message and Update Repository
+For Debian 11 & 12 based PVE:
 ```bash
-nohup ./download-only.sh &>download.log &
-```
-
-## Staging Create Template
-```bash
-nohup ./create-template-staging.sh &>template.log &
-```
-
-## Remove Subscription Message and Change Repo to No Subscription
-Tested on Debian 11 & 12 based PVE
-```
 ./no-subs-repo.sh
 ./remove-subs-message.sh
 ```
 
-## Remove local-lvm and expand local storage
+### Storage Management
 
-- Remove local-lvm from the storage configuration of the Datacenter
-- Execute the following commands on the node's shell:
-```
+To remove local-lvm and expand local storage:
+
+1. Remove local-lvm from the Datacenter storage configuration
+2. Execute:
+```bash
 lvremove /dev/pve/data
 lvresize -l +100%FREE /dev/pve/root
 resize2fs /dev/mapper/pve-root
 ```
 
-## Add PAM User In Proxmox: In 3 Steps
-In order to add the PAM user in Proxmox, we should execute mainly three steps, namely:
+### User Management
 
-1. Firstly, create the user in OS. 
-2. Secondly, add the OS user to Proxmox. 
-3. Lastly, set the permission to the user. 
+#### Adding PAM Users
 
-
-### 1. Creating the user in OS
-In order to add the user, we need to run the below command:
-```
+1. Create OS user:
+```bash
 adduser --shell /bin/bash <user>
 usermod -aG sudo <user>
-# optional to bypass sudo
+# Optional: Configure passwordless sudo
 echo "<user> ALL=(ALL) NOPASSWD: ALL" >>/etc/sudoers
 ```
 
-### 2. Adding OS user to Proxmox
-In order to add a user to Proxmox, run the code:
-```
+2. Add user to Proxmox:
+```bash
 pveum user add <user>@pam
 pveum user list
 ```
 
-### 3. Setting the permission/role to the user.
-The user role is set by using the code:
-```
+3. Set permissions:
+```bash
 pveum acl modify <PATH> --roles PVEAdmin --users <user>@pam
 ```
 
-The default roles in Proxmox VE are as follows: Administrator, PVEAdmin, PVEVMAdmin, PVEVMUser, PVEUserAdmin, PVEDatastoreAdmin, PVEDatastoreUser, PVESysAdmin, PVEPoolAdmin, PVETemplateUser, and PVEAuditor. Additionally, there is a “NoAccess” role to forbid access.
+Available Roles:
+- Administrator
+- PVEAdmin
+- PVEVMAdmin
+- PVEVMUser
+- PVEUserAdmin
+- PVEDatastoreAdmin
+- PVEDatastoreUser
+- PVESysAdmin
+- PVEPoolAdmin
+- PVETemplateUser
+- PVEAuditor
+- NoAccess (to forbid access)
 
-### If sudo not exist
+## Directory Structure
+
 ```
-apt install sudo
+.
+├── template-manager.sh      # Template management script
+├── os-templates.json        # Global mirror templates
+├── os-templates-id.json     # Indonesian mirror templates
+├── config.conf.example      # Example configuration
+├── config.conf             # Your custom configuration (optional)
+├── images/                 # Downloaded images directory
+├── work/                   # Temporary working directory
+├── theme-xxx/              # Theme customization files
+└── scripts/                # Administration utilities
 ```
+
+## Contributing
+
+Feel free to submit issues, fork the repository, and create pull requests for any improvements.
