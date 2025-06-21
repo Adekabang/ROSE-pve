@@ -1,0 +1,22 @@
+# Proxmox VM Template Configuration
+# Copy this file to config.conf and modify as needed
+
+# SSH and Authentication
+SSH_KEYFILE="/root/.ssh/authorized_keys"  # Path to SSH authorized keys
+USERNAME="root"                           # Default template user
+PASSWORD="password"                       # Default template password
+
+# Proxmox Settings
+STORAGE="local"                          # Storage location for templates
+NETWORK="vmbr1"                          # Network bridge
+CPU=1                                    # Number of CPU cores
+MEMORY=512                               # Memory in MB
+BASE_VMID=4001                          # Starting VMID for templates
+
+# System Settings
+TIMEZONE="Asia/Jakarta"                  # Default timezone
+NAMESERVER="1.1.1.1 8.8.8.8 2606:4700:4700::1001"  # DNS servers
+
+# Directory Settings
+IMAGE_DIR="images"                       # Directory for downloaded images
+WORK_DIR="work"                          # Working directory for template creation 

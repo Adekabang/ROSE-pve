@@ -11,20 +11,23 @@ WORK_DIR="work"
 
 # Load configuration if exists
 if [ -f "$CONFIG_FILE" ]; then
+    echo "Loading configuration from $CONFIG_FILE"
     source "$CONFIG_FILE"
+elif [ -f "config.conf.example" ]; then
+    echo "No $CONFIG_FILE found. You can copy config.conf.example to $CONFIG_FILE and modify it."
 fi
 
-# Default Proxmox Configuration
-: ${SSH_KEYFILE:="/root/.ssh/authorized_keys"}
-: ${USERNAME:="root"}
-: ${PASSWORD:="password"}
-: ${STORAGE:="local"}
-: ${NETWORK:="vmbr1"}
-: ${CPU:=1}
-: ${MEMORY:=512}
-: ${BASE_VMID:=4001}
-: ${TIMEZONE:="Asia/Jakarta"}
-: ${NAMESERVER:="1.1.1.1 8.8.8.8 2606:4700:4700::1001"}
+# Default Proxmox Configuration (can be overridden in config.conf)
+: ${SSH_KEYFILE:="/root/.ssh/authorized_keys"}  # Path to SSH authorized keys
+: ${USERNAME:="root"}                           # Default template user
+: ${PASSWORD:="password"}                       # Default template password
+: ${STORAGE:="local"}                          # Storage location for templates
+: ${NETWORK:="vmbr1"}                          # Network bridge
+: ${CPU:=1}                                    # Number of CPU cores
+: ${MEMORY:=512}                               # Memory in MB
+: ${BASE_VMID:=4001}                          # Starting VMID for templates
+: ${TIMEZONE:="Asia/Jakarta"}                  # Default timezone
+: ${NAMESERVER:="1.1.1.1 8.8.8.8 2606:4700:4700::1001"}  # DNS servers
 
 # Required commands
 REQUIRED_COMMANDS="jq wget virt-customize"
@@ -389,8 +392,8 @@ Commands:
     help                           Show this help message
 
 Options:
-    --config FILE                  Use alternative config file
-    --templates FILE              Use alternative templates file
+    --config FILE                  Use alternative config file (default: config.conf)
+    --templates FILE              Use alternative templates file (default: os-templates.json)
 
 Examples:
     $0 list
@@ -403,9 +406,24 @@ Directory Structure:
     ./images/   - Stores downloaded OS images
     ./work/     - Temporary working directory for template creation
     
-Configuration:
-    ./config.conf      - Optional configuration file
-    ./os-templates.json - Template definitions
+Configuration Files:
+    config.conf       - Main configuration file (optional)
+    config.conf.example - Example configuration file with documentation
+    os-templates.json  - Template definitions
+
+Configuration Options (can be set in config.conf):
+    SSH_KEYFILE  - Path to SSH authorized keys (default: /root/.ssh/authorized_keys)
+    USERNAME     - Default template user (default: root)
+    PASSWORD     - Default template password (default: password)
+    STORAGE      - Storage location for templates (default: local)
+    NETWORK      - Network bridge (default: vmbr1)
+    CPU          - Number of CPU cores (default: 1)
+    MEMORY       - Memory in MB (default: 512)
+    BASE_VMID    - Starting VMID for templates (default: 4001)
+    TIMEZONE     - Default timezone (default: Asia/Jakarta)
+    NAMESERVER   - DNS servers (default: 1.1.1.1 8.8.8.8 2606:4700:4700::1001)
+
+For detailed configuration options, copy config.conf.example to config.conf and modify as needed.
 
 EOF
 }
