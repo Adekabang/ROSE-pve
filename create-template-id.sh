@@ -9,8 +9,8 @@ username="root"
 password="password"
 storage="local"
 network="vmbr1"
-cpu=2
-memory=2048
+cpu=1
+memory=512
 base_vmid=4001
 timezone="Asia/Jakarta"
 nameserver="10.0.1.1 1.1.1.1 8.8.8.8 2606:4700:4700::1001"
@@ -23,7 +23,7 @@ customize_image() {
     echo "Customizing image for $os_type"
 
     # Temporary copy from original
-    # cp os-images/$file_name ~/ROSE-pve 
+    # cp ~/os-images/$file_name ~/ROSE-pve 
 
     case $os_type in
         "debian"|"ubuntu")
@@ -113,8 +113,8 @@ create_template() {
     qm set $vm_id --ciuser ${username}
     qm set $vm_id --nameserver "${nameserver}"
 
-    # Attempt to resize the disk to 25G
-    qm disk resize $vm_id scsi0 25G || echo "Disk already larger than 25G or resize failed"
+    # Attempt to resize the disk to 15G
+    qm disk resize $vm_id scsi0 15G || echo "Disk already larger than 15G or resize failed"
 
     # Convert to template
     qm template $vm_id
@@ -145,14 +145,20 @@ declare -A os_templates=(
     ["Ubuntu 24.04"]="temp-ubuntu-24-04|https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img|ubuntu-24.04-server-cloudimg-amd64.img|ubuntu"
     ["CentOS Stream 8"]="temp-centos-8-stream|https://cloud.centos.org/centos/8-stream/x86_64/images/CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2|CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2|centos8"
     ["CentOS Stream 9"]="temp-centos-9-stream|https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2|CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2|centos"
+    ["CentOS Stream 10"]="temp-centos-10-stream|https://cloud.centos.org/centos/10-stream/x86_64/images/CentOS-Stream-GenericCloud-10-latest.x86_64.qcow2|CentOS-Stream-GenericCloud-10-latest.x86_64.qcow2|centos"
     ["Rocky Linux 8"]="temp-rocky-linux-8-generic|https://mirror.nevacloud.com/rockylinux/8/images/x86_64/Rocky-8-GenericCloud-Base.latest.x86_64.qcow2|Rocky-8-GenericCloud-Base.latest.x86_64.qcow2|rocky8"
     ["Rocky Linux 9"]="temp-rocky-linux-9-generic|https://mirror.nevacloud.com/rockylinux/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2|Rocky-9-GenericCloud-Base.latest.x86_64.qcow2|rocky"
+    ["Rocky Linux 10"]="temp-rocky-linux-10-generic|https://mirror.nevacloud.com/rockylinux/10/images/x86_64/Rocky-10-GenericCloud-Base.latest.x86_64.qcow2|Rocky-10-GenericCloud-Base.latest.x86_64.qcow2|rocky"
     ["AlmaLinux 8"]="temp-almalinux-8-generic|https://mirror.nevacloud.com/almalinux/8/cloud/x86_64/images/AlmaLinux-8-GenericCloud-latest.x86_64.qcow2|AlmaLinux-8-GenericCloud-latest.x86_64.qcow2|alma8"
     ["AlmaLinux 9"]="temp-almalinux-9-generic|https://mirror.nevacloud.com/almalinux/9/cloud/x86_64/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2|AlmaLinux-9-GenericCloud-latest.x86_64.qcow2|alma"
-    ["FreeBSD 13.3 UFS"]="temp-freebsd-13-3-ufs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/13.3/2024-05-06/ufs/freebsd-13.3-ufs-2024-05-06.qcow2|freebsd-13.3-ufs-2024-05-06.qcow2|freebsd"
-    ["FreeBSD 13.3 ZFS"]="temp-freebsd-13-3-zfs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/13.3/2024-05-06/zfs/freebsd-13.3-zfs-2024-05-06.qcow2|freebsd-13.3-zfs-2024-05-06.qcow2|freebsd"
-    ["FreeBSD 14.0 UFS"]="temp-freebsd-14-0-ufs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.0/2024-05-04/ufs/freebsd-14.0-ufs-2024-05-04.qcow2|freebsd-14.0-ufs-2024-05-04.qcow2|freebsd"
-    ["FreeBSD 14.0 ZFS"]="temp-freebsd-14-0-zfs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.0/2024-05-06/zfs/freebsd-14.0-zfs-2024-05-06.qcow2|freebsd-14.0-zfs-2024-05-06.qcow2|freebsd"
+    ["AlmaLinux 10"]="temp-almalinux-10-generic|https://mirror.nevacloud.com/almalinux/10/cloud/x86_64/images/AlmaLinux-10-GenericCloud-latest.x86_64.qcow2|AlmaLinux-10-GenericCloud-latest.x86_64.qcow2|alma"
+    ["FreeBSD 13.4 UFS"]="temp-freebsd-13-4-ufs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/13.4/2024-10-28/ufs/freebsd-13.4-ufs-2024-10-28.qcow2|freebsd-13.4-ufs-2024-10-28.qcow2|freebsd"
+    ["FreeBSD 13.4 ZFS"]="temp-freebsd-13-4-zfs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/13.4/2024-10-28/zfs/freebsd-13.4-zfs-2024-10-28.qcow2|freebsd-13.4-zfs-2024-10-28.qcow2|freebsd"
+    ["FreeBSD 14.2 UFS"]="temp-freebsd-14-2-ufs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.2/2024-12-08/ufs/freebsd-14.2-ufs-2024-12-08.qcow2|freebsd-14.2-ufs-2024-12-08.qcow2|freebsd"
+    ["FreeBSD 14.2 ZFS"]="temp-freebsd-14-2-zfs|https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.2/2024-12-08/zfs/freebsd-14.2-zfs-2024-12-08.qcow2|freebsd-14.2-zfs-2024-12-08.qcow2|freebsd"
+    # ["Windows Server 2019 Standard"]="temp-windows-server-2019-standard|https://os-cdn.virtfusion.net/windows/windows-server-2019-standard-virtfusion.qcow2|windows-server-2019-standard-virtfusion.qcow2|windows"
+    # ["Windows Server 2022 Standard"]="temp-windows-server-2022-standard|https://os-cdn.virtfusion.net/windows/windows-server-2022-standard-virtfusion.qcow2|windows-server-2022-standard-virtfusion.qcow2|windows"
+    # ["Windows Server 2025 Standard"]="temp-windows-server-2025-standard|https://os-cdn.virtfusion.net/windows/windows-server-2025-standard-virtfusion.qcow2|windows-server-2025-standard-virtfusion.qcow2|windows"
 )
 
 # Main loop to create templates
