@@ -1,0 +1,147 @@
+{
+    "debian": {
+        "10": {
+            "name": "Debian 10",
+            "template_name": "temp-debian-10",
+            "url": "https://cloud.debian.org/images/cloud/buster/latest/debian-10-genericcloud-amd64.qcow2",
+            "filename": "debian-10-genericcloud-amd64.qcow2",
+            "os_type": "debian"
+        },
+        "11": {
+            "name": "Debian 11",
+            "template_name": "temp-debian-11",
+            "url": "https://cloud.debian.org/images/cloud/bullseye/latest/debian-11-genericcloud-amd64.qcow2",
+            "filename": "debian-11-genericcloud-amd64.qcow2",
+            "os_type": "debian"
+        },
+        "12": {
+            "name": "Debian 12",
+            "template_name": "temp-debian-12",
+            "url": "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2",
+            "filename": "debian-12-genericcloud-amd64.qcow2",
+            "os_type": "debian"
+        }
+    },
+    "ubuntu": {
+        "20.04": {
+            "name": "Ubuntu 20.04",
+            "template_name": "temp-ubuntu-20-04",
+            "url": "https://cloud-images.ubuntu.com/releases/20.04/release/ubuntu-20.04-server-cloudimg-amd64.img",
+            "filename": "ubuntu-20.04-server-cloudimg-amd64.img",
+            "os_type": "ubuntu"
+        },
+        "22.04": {
+            "name": "Ubuntu 22.04",
+            "template_name": "temp-ubuntu-22-04",
+            "url": "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img",
+            "filename": "ubuntu-22.04-server-cloudimg-amd64.img",
+            "os_type": "ubuntu"
+        },
+        "24.04": {
+            "name": "Ubuntu 24.04",
+            "template_name": "temp-ubuntu-24-04",
+            "url": "https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img",
+            "filename": "ubuntu-24.04-server-cloudimg-amd64.img",
+            "os_type": "ubuntu"
+        }
+    },
+    "centos": {
+        "8-stream": {
+            "name": "CentOS Stream 8",
+            "template_name": "temp-centos-8-stream",
+            "url": "https://cloud.centos.org/centos/8-stream/x86_64/images/CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2",
+            "filename": "CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2",
+            "os_type": "centos8"
+        },
+        "9-stream": {
+            "name": "CentOS Stream 9",
+            "template_name": "temp-centos-9-stream",
+            "url": "https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2",
+            "filename": "CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2",
+            "os_type": "centos"
+        },
+        "10-stream": {
+            "name": "CentOS Stream 10",
+            "template_name": "temp-centos-10-stream",
+            "url": "https://cloud.centos.org/centos/10-stream/x86_64/images/CentOS-Stream-GenericCloud-10-latest.x86_64.qcow2",
+            "filename": "CentOS-Stream-GenericCloud-10-latest.x86_64.qcow2",
+            "os_type": "centos"
+        }
+    },
+    "rocky": {
+        "8": {
+            "name": "Rocky Linux 8",
+            "template_name": "temp-rocky-linux-8-generic",
+            "url": "https://mirror.nevacloud.com/rockylinux/8/images/x86_64/Rocky-8-GenericCloud-Base.latest.x86_64.qcow2",
+            "filename": "Rocky-8-GenericCloud-Base.latest.x86_64.qcow2",
+            "os_type": "rocky8"
+        },
+        "9": {
+            "name": "Rocky Linux 9",
+            "template_name": "temp-rocky-linux-9-generic",
+            "url": "https://mirror.nevacloud.com/rockylinux/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2",
+            "filename": "Rocky-9-GenericCloud-Base.latest.x86_64.qcow2",
+            "os_type": "rocky"
+        },
+        "10": {
+            "name": "Rocky Linux 10",
+            "template_name": "temp-rocky-linux-10-generic",
+            "url": "https://mirror.nevacloud.com/rockylinux/10/images/x86_64/Rocky-10-GenericCloud-Base.latest.x86_64.qcow2",
+            "filename": "Rocky-10-GenericCloud-Base.latest.x86_64.qcow2",
+            "os_type": "rocky"
+        }
+    },
+    "alma": {
+        "8": {
+            "name": "AlmaLinux 8",
+            "template_name": "temp-almalinux-8-generic",
+            "url": "https://mirror.nevacloud.com/almalinux/8/cloud/x86_64/images/AlmaLinux-8-GenericCloud-latest.x86_64.qcow2",
+            "filename": "AlmaLinux-8-GenericCloud-latest.x86_64.qcow2",
+            "os_type": "alma8"
+        },
+        "9": {
+            "name": "AlmaLinux 9",
+            "template_name": "temp-almalinux-9-generic",
+            "url": "https://mirror.nevacloud.com/almalinux/9/cloud/x86_64/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2",
+            "filename": "AlmaLinux-9-GenericCloud-latest.x86_64.qcow2",
+            "os_type": "alma"
+        },
+        "10": {
+            "name": "AlmaLinux 10",
+            "template_name": "temp-almalinux-10-generic",
+            "url": "https://mirror.nevacloud.com/almalinux/10/cloud/x86_64/images/AlmaLinux-10-GenericCloud-latest.x86_64.qcow2",
+            "filename": "AlmaLinux-10-GenericCloud-latest.x86_64.qcow2",
+            "os_type": "alma"
+        }
+    },
+    "freebsd": {
+        "13.4-ufs": {
+            "name": "FreeBSD 13.4 UFS",
+            "template_name": "temp-freebsd-13-4-ufs",
+            "url": "https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/13.4/2024-10-28/ufs/freebsd-13.4-ufs-2024-10-28.qcow2",
+            "filename": "freebsd-13.4-ufs-2024-10-28.qcow2",
+            "os_type": "freebsd"
+        },
+        "13.4-zfs": {
+            "name": "FreeBSD 13.4 ZFS",
+            "template_name": "temp-freebsd-13-4-zfs",
+            "url": "https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/13.4/2024-10-28/zfs/freebsd-13.4-zfs-2024-10-28.qcow2",
+            "filename": "freebsd-13.4-zfs-2024-10-28.qcow2",
+            "os_type": "freebsd"
+        },
+        "14.2-ufs": {
+            "name": "FreeBSD 14.2 UFS",
+            "template_name": "temp-freebsd-14-2-ufs",
+            "url": "https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.2/2024-12-08/ufs/freebsd-14.2-ufs-2024-12-08.qcow2",
+            "filename": "freebsd-14.2-ufs-2024-12-08.qcow2",
+            "os_type": "freebsd"
+        },
+        "14.2-zfs": {
+            "name": "FreeBSD 14.2 ZFS",
+            "template_name": "temp-freebsd-14-2-zfs",
+            "url": "https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/14.2/2024-12-08/zfs/freebsd-14.2-zfs-2024-12-08.qcow2",
+            "filename": "freebsd-14.2-zfs-2024-12-08.qcow2",
+            "os_type": "freebsd"
+        }
+    }
+} 
