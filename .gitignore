@@ -2,3 +2,5 @@
 *.img
 *.qcow2
 /os-images
+.DS_Store
+*/.DS_Store

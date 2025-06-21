@@ -71,10 +71,40 @@ ensure_script_dir() {
 
 # Function to list available templates
 list_templates() {
-    echo "Available templates:"
-    echo "------------------"
-    jq -r 'to_entries[] | .key as $os | .value | to_entries[] | .key as $ver | .value | 
-        "\($os)/\($ver):\n  Name: \(.name)\n  Template: \(.template_name)"' "$TEMPLATES_FILE"
+    echo "Available Templates"
+    echo "=================="
+    echo
+    
+    # Function to print a separator line
+    print_separator() {
+        printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    }
+    
+    # Function to print OS family header
+    print_os_header() {
+        local os=$1
+        echo "${os^} Templates:"
+        print_separator
+        printf "%-15s %-25s %s\n" "VERSION" "NAME" "TEMPLATE ID"
+        print_separator
+    }
+    
+    # Process each OS family
+    for os in $(jq -r 'keys[]' "$TEMPLATES_FILE" | sort); do
+        echo
+        print_os_header "$os"
+        
+        # Get and sort versions for this OS
+        versions=$(jq -r --arg os "$os" '.[$os] | keys[]' "$TEMPLATES_FILE" | sort -V)
+        
+        # Print each version's details
+        while IFS= read -r version; do
+            name=$(jq -r --arg os "$os" --arg ver "$version" '.[$os][$ver].name' "$TEMPLATES_FILE")
+            template=$(jq -r --arg os "$os" --arg ver "$version" '.[$os][$ver].template_name' "$TEMPLATES_FILE")
+            printf "%-15s %-25s %s\n" "$version" "$name" "$template"
+        done <<< "$versions"
+    done
+    echo
 }
 
 # Function to download a specific template
