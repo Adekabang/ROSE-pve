@@ -209,11 +209,118 @@ find_next_available_vmid() {
     echo $current_id
 }
 
+# Function to ensure image exists
+ensure_image_exists() {
+    local os_type=$1
+    local version=$2
+    
+    # Get template information
+    local template_info=$(jq -r --arg os "$os_type" --arg ver "$version" '.[$os][$ver]' "$TEMPLATES_FILE")
+    
+    if [ "$template_info" = "null" ]; then
+        echo "Error: Template not found for $os_type version $version"
+        return 1
+    fi
+    
+    local filename=$(echo "$template_info" | jq -r '.filename')
+    
+    if [ ! -f "$IMAGE_DIR/$filename" ]; then
+        echo "Image not found. Downloading first..."
+        download_template "$os_type" "$version"
+        if [ $? -ne 0 ]; then
+            echo "Failed to download required image."
+            return 1
+        fi
+    fi
+    
+    return 0
+}
+
+# Function to download all templates
+download_all() {
+    local failed=()
+    local total=0
+    local success=0
+    
+    echo "Downloading all templates..."
+    echo
+    
+    # Process each OS and version
+    while IFS=$'\t' read -r os version; do
+        ((total++))
+        echo "Downloading $os $version..."
+        if download_template "$os" "$version"; then
+            ((success++))
+            echo "✓ Successfully downloaded $os $version"
+        else
+            failed+=("$os $version")
+            echo "✗ Failed to download $os $version"
+        fi
+        echo
+    done < <(jq -r 'to_entries[] | .key as $os | .value | to_entries[] | .key as $ver | [$os, $ver] | @tsv' "$TEMPLATES_FILE")
+    
+    echo "Download Summary:"
+    echo "----------------"
+    echo "Total templates: $total"
+    echo "Successfully downloaded: $success"
+    echo "Failed: ${#failed[@]}"
+    
+    if [ ${#failed[@]} -gt 0 ]; then
+        echo
+        echo "Failed templates:"
+        printf '%s\n' "${failed[@]}"
+        return 1
+    fi
+    
+    return 0
+}
+
+# Function to create all templates
+create_all() {
+    local failed=()
+    local total=0
+    local success=0
+    
+    echo "Creating all templates..."
+    echo
+    
+    # Process each OS and version
+    while IFS=$'\t' read -r os version; do
+        ((total++))
+        echo "Creating template for $os $version..."
+        if create_template "$os" "$version"; then
+            ((success++))
+            echo "✓ Successfully created template for $os $version"
+        else
+            failed+=("$os $version")
+            echo "✗ Failed to create template for $os $version"
+        fi
+        echo
+    done < <(jq -r 'to_entries[] | .key as $os | .value | to_entries[] | .key as $ver | [$os, $ver] | @tsv' "$TEMPLATES_FILE")
+    
+    echo "Creation Summary:"
+    echo "----------------"
+    echo "Total templates: $total"
+    echo "Successfully created: $success"
+    echo "Failed: ${#failed[@]}"
+    
+    if [ ${#failed[@]} -gt 0 ]; then
+        echo
+        echo "Failed templates:"
+        printf '%s\n' "${failed[@]}"
+        return 1
+    fi
+    
+    return 0
+}
+
 # Function to create template
 create_template() {
     local os_type=$1
     local version=$2
-    local use_staging=${3:-false}
+    
+    # Ensure image exists
+    ensure_image_exists "$os_type" "$version" || return 1
     
     # Get template information
     local template_info=$(jq -r --arg os "$os_type" --arg ver "$version" '.[$os][$ver]' "$TEMPLATES_FILE")
@@ -264,6 +371,8 @@ create_template() {
     # Cleanup
     cd ..
     rm -f "$WORK_DIR/$filename"
+    
+    return 0
 }
 
 # Function to show help
@@ -274,7 +383,9 @@ Usage: $0 [OPTIONS] COMMAND [ARGS...]
 Commands:
     list                            List all available templates
     download OS VERSION             Download a specific template
+    download-all                    Download all available templates
     create OS VERSION              Create a template
+    create-all                     Create templates for all downloaded images
     help                           Show this help message
 
 Options:
@@ -284,7 +395,9 @@ Options:
 Examples:
     $0 list
     $0 download debian 12
+    $0 download-all
     $0 create ubuntu 22.04
+    $0 create-all
 
 Directory Structure:
     ./images/   - Stores downloaded OS images
@@ -329,6 +442,10 @@ main() {
                 download_template "$2" "$3"
                 exit $?
                 ;;
+            download-all)
+                download_all
+                exit $?
+                ;;
             create)
                 if [ $# -lt 3 ]; then
                     echo "Error: create command requires OS and VERSION arguments"
@@ -336,6 +453,10 @@ main() {
                     exit 1
                 fi
                 create_template "$2" "$3"
+                exit $?
+                ;;
+            create-all)
+                create_all
                 exit $?
                 ;;
             help|--help|-h)
