@@ -83,6 +83,34 @@ vim config.conf
 ./template-manager.sh --templates os-templates-id.json download debian 12
 ```
 
+### Background Operations
+
+Run template operations in the background and save logs:
+
+```bash
+# Download templates in background
+nohup ./template-manager.sh download-all &>download.log &
+
+# Create templates in background
+nohup ./template-manager.sh create-all &>template.log &
+
+# Download specific OS group in background
+nohup ./template-manager.sh download-group debian &>debian-download.log &
+
+# Create specific OS group in background
+nohup ./template-manager.sh create-group ubuntu &>ubuntu-template.log &
+
+# Check progress
+tail -f download.log    # Monitor download progress
+tail -f template.log    # Monitor template creation progress
+```
+
+You can check the process status using:
+```bash
+jobs            # List background jobs
+ps aux | grep template-manager.sh    # Find running template manager processes
+```
+
 ### Configuration Options
 
 Edit `config.conf` to customize your template settings:
