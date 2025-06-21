@@ -523,13 +523,94 @@ list_groups() {
     echo "Use 'list <os_group>' to see specific versions for an OS group"
 }
 
+# Function to list existing templates in Proxmox
+list_existing_templates() {
+    echo "Existing Templates in Proxmox:"
+    echo "============================="
+    
+    # Get all VMs and filter templates
+    qm list | grep "template" | while read -r line; do
+        vmid=$(echo "$line" | awk '{print $1}')
+        name=$(echo "$line" | awk '{print $2}')
+        status=$(echo "$line" | awk '{print $3}')
+        
+        # Get additional info
+        mem=$(qm config "$vmid" | grep "^memory:" | awk '{print $2}')
+        cores=$(qm config "$vmid" | grep "^cores:" | awk '{print $2}')
+        
+        printf "VMID: %-8s Name: %-30s Memory: %-6s Cores: %s\n" "$vmid" "$name" "${mem}MB" "$cores"
+    done
+}
+
+# Function to remove template
+remove_template() {
+    local vmid=$1
+    
+    # Check if VMID exists and is a template
+    if ! qm status "$vmid" &>/dev/null; then
+        echo "Error: Template with VMID $vmid not found"
+        return 1
+    fi
+    
+    # Check if it's actually a template
+    if ! qm config "$vmid" | grep -q "template: 1"; then
+        echo "Error: VM $vmid is not a template"
+        return 1
+    fi
+    
+    # Get template name for confirmation
+    local name=$(qm config "$vmid" | grep "^name:" | cut -d' ' -f2-)
+    
+    echo "Warning: About to remove template:"
+    echo "VMID: $vmid"
+    echo "Name: $name"
+    echo
+    read -p "Are you sure you want to remove this template? (y/N) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo "Removing template $vmid ($name)..."
+        qm destroy "$vmid"
+        if [ $? -eq 0 ]; then
+            echo "Template removed successfully"
+        else
+            echo "Error removing template"
+            return 1
+        fi
+    else
+        echo "Operation cancelled"
+        return 0
+    fi
+}
+
+# Function to remove multiple templates
+remove_templates() {
+    local vmids=("$@")
+    local success=0
+    local failed=0
+    
+    for vmid in "${vmids[@]}"; do
+        echo "Processing VMID $vmid..."
+        if remove_template "$vmid"; then
+            ((success++))
+        else
+            ((failed++))
+        fi
+        echo
+    done
+    
+    echo "Summary:"
+    echo "Successfully removed: $success"
+    echo "Failed: $failed"
+}
+
 # Function to show help
 show_help() {
     cat << EOF
 Usage: $0 [OPTIONS] COMMAND [ARGS...]
 
 Commands:
-    list [OS_GROUP]                 List all templates or templates for specific OS group
+    list                            List all available templates
+    list-existing                   List existing templates in Proxmox
     groups                         List available OS groups
     download OS VERSION             Download a specific template
     download-all                    Download all available templates
@@ -537,6 +618,8 @@ Commands:
     create OS VERSION              Create a template
     create-all                     Create templates for all downloaded images
     create-group OS_GROUP          Create all templates for an OS group
+    remove VMID                    Remove a specific template
+    remove-multiple VMID1 VMID2... Remove multiple templates
     help                           Show this help message
 
 Options:
@@ -546,32 +629,14 @@ Options:
 Examples:
     $0 list                       # List all templates
     $0 list debian               # List Debian templates only
+    $0 list-existing            # List existing templates in Proxmox
     $0 groups                    # List available OS groups
     $0 download debian 12        # Download specific template
     $0 download-group debian     # Download all Debian templates
     $0 create ubuntu 22.04       # Create specific template
     $0 create-group ubuntu       # Create all Ubuntu templates
-
-Directory Structure:
-    ./images/   - Stores downloaded OS images
-    ./work/     - Temporary working directory for template creation
-    
-Configuration Files:
-    config.conf       - Main configuration file (optional)
-    config.conf.example - Example configuration file with documentation
-    os-templates.json  - Template definitions
-
-Configuration Options (can be set in config.conf):
-    SSH_KEYFILE  - Path to SSH authorized keys (default: /root/.ssh/authorized_keys)
-    USERNAME     - Default template user (default: root)
-    PASSWORD     - Default template password (default: password)
-    STORAGE      - Storage location for templates (default: local)
-    NETWORK      - Network bridge (default: vmbr1)
-    CPU          - Number of CPU cores (default: 1)
-    MEMORY       - Memory in MB (default: 512)
-    BASE_VMID    - Starting VMID for templates (default: 4001)
-    TIMEZONE     - Default timezone (default: Asia/Jakarta)
-    NAMESERVER   - DNS servers (default: 1.1.1.1 8.8.8.8 2606:4700:4700::1001)
+    $0 remove 4001              # Remove template with VMID 4001
+    $0 remove-multiple 4001 4002 # Remove multiple templates
 
 For detailed configuration options, copy config.conf.example to config.conf and modify as needed.
 
@@ -605,6 +670,10 @@ main() {
                     list_templates
                     shift 1
                 fi
+                exit 0
+                ;;
+            list-existing)
+                list_existing_templates
                 exit 0
                 ;;
             groups)
@@ -653,6 +722,25 @@ main() {
                     exit 1
                 fi
                 create_group "$2"
+                exit $?
+                ;;
+            remove)
+                if [ $# -lt 2 ]; then
+                    echo "Error: remove command requires VMID argument"
+                    show_help
+                    exit 1
+                fi
+                remove_template "$2"
+                exit $?
+                ;;
+            remove-multiple)
+                if [ $# -lt 2 ]; then
+                    echo "Error: remove-multiple command requires at least one VMID"
+                    show_help
+                    exit 1
+                fi
+                shift
+                remove_templates "$@"
                 exit $?
                 ;;
             help|--help|-h)

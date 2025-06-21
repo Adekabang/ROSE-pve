@@ -217,3 +217,32 @@ Available Roles:
 ## Contributing
 
 Feel free to submit issues, fork the repository, and create pull requests for any improvements.
+
+### Template Management
+
+List and manage existing templates in your Proxmox system:
+
+```bash
+# List all existing templates in Proxmox
+./template-manager.sh list-existing
+
+# Remove a specific template (will prompt for confirmation)
+./template-manager.sh remove 4001
+
+# Remove multiple templates at once
+./template-manager.sh remove-multiple 4001 4002 4003
+```
+
+The `list-existing` command shows:
+- Template VMID
+- Template Name
+- Memory allocation
+- CPU cores
+
+When removing templates:
+- Confirmation is required for safety
+- Templates are verified before removal
+- Summary of successful/failed removals is provided
+- Only actual templates can be removed (VMs are protected)
+
+### Background Operations
