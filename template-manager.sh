@@ -74,40 +74,53 @@ ensure_script_dir() {
 
 # Function to list available templates
 list_templates() {
-    echo "Available Templates"
-    echo "=================="
-    echo
+    local os_group=$1
     
-    # Function to print a separator line
-    print_separator() {
-        printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-    }
-    
-    # Function to print OS family header
-    print_os_header() {
-        local os=$1
-        echo "${os^} Templates:"
+    if [ -n "$os_group" ]; then
+        # Validate OS group
+        validate_os_group "$os_group" || return 1
+        
+        echo "Available $os_group Templates:"
+        echo "=========================="
+        echo
+        
+        # Print header
         print_separator
         printf "%-15s %-25s %s\n" "VERSION" "NAME" "TEMPLATE ID"
         print_separator
-    }
-    
-    # Process each OS family
-    for os in $(jq -r 'keys[]' "$TEMPLATES_FILE" | sort); do
-        echo
-        print_os_header "$os"
         
         # Get and sort versions for this OS
-        versions=$(jq -r --arg os "$os" '.[$os] | keys[]' "$TEMPLATES_FILE" | sort -V)
+        versions=$(jq -r --arg os "$os_group" '.[$os] | keys[]' "$TEMPLATES_FILE" | sort -V)
         
         # Print each version's details
         while IFS= read -r version; do
-            name=$(jq -r --arg os "$os" --arg ver "$version" '.[$os][$ver].name' "$TEMPLATES_FILE")
-            template=$(jq -r --arg os "$os" --arg ver "$version" '.[$os][$ver].template_name' "$TEMPLATES_FILE")
+            name=$(jq -r --arg os "$os_group" --arg ver "$version" '.[$os][$ver].name' "$TEMPLATES_FILE")
+            template=$(jq -r --arg os "$os_group" --arg ver "$version" '.[$os][$ver].template_name' "$TEMPLATES_FILE")
             printf "%-15s %-25s %s\n" "$version" "$name" "$template"
         done <<< "$versions"
-    done
-    echo
+        echo
+    else
+        # List all templates grouped by OS
+        echo "Available Templates"
+        echo "=================="
+        echo
+        
+        # Process each OS family
+        for os in $(jq -r 'keys[]' "$TEMPLATES_FILE" | sort); do
+            print_os_header "$os"
+            
+            # Get and sort versions for this OS
+            versions=$(jq -r --arg os "$os" '.[$os] | keys[]' "$TEMPLATES_FILE" | sort -V)
+            
+            # Print each version's details
+            while IFS= read -r version; do
+                name=$(jq -r --arg os "$os" --arg ver "$version" '.[$os][$ver].name' "$TEMPLATES_FILE")
+                template=$(jq -r --arg os "$os" --arg ver "$version" '.[$os][$ver].template_name' "$TEMPLATES_FILE")
+                printf "%-15s %-25s %s\n" "$version" "$name" "$template"
+            done <<< "$versions"
+            echo
+        done
+    fi
 }
 
 # Function to download a specific template
@@ -378,17 +391,128 @@ create_template() {
     return 0
 }
 
+# Function to validate OS group
+validate_os_group() {
+    local os_group=$1
+    if jq -e --arg os "$os_group" 'has($os)' "$TEMPLATES_FILE" > /dev/null; then
+        return 0
+    else
+        echo "Error: OS group '$os_group' not found"
+        echo "Available OS groups:"
+        jq -r 'keys[]' "$TEMPLATES_FILE" | sed 's/^/  - /'
+        return 1
+    fi
+}
+
+# Function to download templates for a specific OS group
+download_group() {
+    local os_group=$1
+    local failed=()
+    local total=0
+    local success=0
+    
+    # Validate OS group
+    validate_os_group "$os_group" || return 1
+    
+    echo "Downloading all $os_group templates..."
+    echo
+    
+    # Process each version for the OS group
+    while IFS= read -r version; do
+        ((total++))
+        echo "Downloading $os_group $version..."
+        if download_template "$os_group" "$version"; then
+            ((success++))
+            echo "✓ Successfully downloaded $os_group $version"
+        else
+            failed+=("$os_group $version")
+            echo "✗ Failed to download $os_group $version"
+        fi
+        echo
+    done < <(jq -r --arg os "$os_group" '.[$os] | keys[]' "$TEMPLATES_FILE")
+    
+    echo "Download Summary for $os_group:"
+    echo "-------------------------"
+    echo "Total templates: $total"
+    echo "Successfully downloaded: $success"
+    echo "Failed: ${#failed[@]}"
+    
+    if [ ${#failed[@]} -gt 0 ]; then
+        echo
+        echo "Failed templates:"
+        printf '%s\n' "${failed[@]}"
+        return 1
+    fi
+    
+    return 0
+}
+
+# Function to create templates for a specific OS group
+create_group() {
+    local os_group=$1
+    local failed=()
+    local total=0
+    local success=0
+    
+    # Validate OS group
+    validate_os_group "$os_group" || return 1
+    
+    echo "Creating all $os_group templates..."
+    echo
+    
+    # Process each version for the OS group
+    while IFS= read -r version; do
+        ((total++))
+        echo "Creating template for $os_group $version..."
+        if create_template "$os_group" "$version"; then
+            ((success++))
+            echo "✓ Successfully created template for $os_group $version"
+        else
+            failed+=("$os_group $version")
+            echo "✗ Failed to create template for $os_group $version"
+        fi
+        echo
+    done < <(jq -r --arg os "$os_group" '.[$os] | keys[]' "$TEMPLATES_FILE")
+    
+    echo "Creation Summary for $os_group:"
+    echo "-------------------------"
+    echo "Total templates: $total"
+    echo "Successfully created: $success"
+    echo "Failed: ${#failed[@]}"
+    
+    if [ ${#failed[@]} -gt 0 ]; then
+        echo
+        echo "Failed templates:"
+        printf '%s\n' "${failed[@]}"
+        return 1
+    fi
+    
+    return 0
+}
+
+# Function to list available OS groups
+list_groups() {
+    echo "Available OS Groups:"
+    echo "-----------------"
+    jq -r 'keys[] as $os | $os + ":\n" + (.[$os] | keys | length | tostring) + " version(s)"' "$TEMPLATES_FILE"
+    echo
+    echo "Use 'list <os_group>' to see specific versions for an OS group"
+}
+
 # Function to show help
 show_help() {
     cat << EOF
 Usage: $0 [OPTIONS] COMMAND [ARGS...]
 
 Commands:
-    list                            List all available templates
+    list [OS_GROUP]                 List all templates or templates for specific OS group
+    groups                         List available OS groups
     download OS VERSION             Download a specific template
     download-all                    Download all available templates
+    download-group OS_GROUP         Download all templates for an OS group
     create OS VERSION              Create a template
     create-all                     Create templates for all downloaded images
+    create-group OS_GROUP          Create all templates for an OS group
     help                           Show this help message
 
 Options:
@@ -396,11 +520,13 @@ Options:
     --templates FILE              Use alternative templates file (default: os-templates.json)
 
 Examples:
-    $0 list
-    $0 download debian 12
-    $0 download-all
-    $0 create ubuntu 22.04
-    $0 create-all
+    $0 list                       # List all templates
+    $0 list debian               # List Debian templates only
+    $0 groups                    # List available OS groups
+    $0 download debian 12        # Download specific template
+    $0 download-group debian     # Download all Debian templates
+    $0 create ubuntu 22.04       # Create specific template
+    $0 create-group ubuntu       # Create all Ubuntu templates
 
 Directory Structure:
     ./images/   - Stores downloaded OS images
@@ -448,7 +574,17 @@ main() {
                 shift 2
                 ;;
             list)
-                list_templates
+                if [ -n "$2" ] && [[ "$2" != -* ]]; then
+                    list_templates "$2"
+                    shift 2
+                else
+                    list_templates
+                    shift 1
+                fi
+                exit 0
+                ;;
+            groups)
+                list_groups
                 exit 0
                 ;;
             download)
@@ -464,6 +600,15 @@ main() {
                 download_all
                 exit $?
                 ;;
+            download-group)
+                if [ $# -lt 2 ]; then
+                    echo "Error: download-group command requires OS_GROUP argument"
+                    show_help
+                    exit 1
+                fi
+                download_group "$2"
+                exit $?
+                ;;
             create)
                 if [ $# -lt 3 ]; then
                     echo "Error: create command requires OS and VERSION arguments"
@@ -475,6 +620,15 @@ main() {
                 ;;
             create-all)
                 create_all
+                exit $?
+                ;;
+            create-group)
+                if [ $# -lt 2 ]; then
+                    echo "Error: create-group command requires OS_GROUP argument"
+                    show_help
+                    exit 1
+                fi
+                create_group "$2"
                 exit $?
                 ;;
             help|--help|-h)
