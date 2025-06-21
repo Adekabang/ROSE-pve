@@ -560,6 +560,7 @@ list_existing_templates() {
 # Function to remove template
 remove_template() {
     local vmid=$1
+    local skip_confirmation=$2
     
     # Check if VMID exists and is a template
     if ! qm status "$vmid" &>/dev/null; then
@@ -576,24 +577,27 @@ remove_template() {
     # Get template name for confirmation
     local name=$(qm config "$vmid" | grep "^name:" | cut -d' ' -f2-)
     
-    echo "Warning: About to remove template:"
-    echo "VMID: $vmid"
-    echo "Name: $name"
-    echo
-    read -p "Are you sure you want to remove this template? (y/N) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "Removing template $vmid ($name)..."
-        qm destroy "$vmid"
-        if [ $? -eq 0 ]; then
-            echo "Template removed successfully"
-        else
-            echo "Error removing template"
-            return 1
+    if [ "$skip_confirmation" != "true" ]; then
+        echo "Warning: About to remove template:"
+        echo "VMID: $vmid"
+        echo "Name: $name"
+        echo
+        read -p "Are you sure you want to remove this template? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo "Operation cancelled"
+            return 0
         fi
-    else
-        echo "Operation cancelled"
+    fi
+    
+    echo "Removing template $vmid ($name)..."
+    qm destroy "$vmid"
+    if [ $? -eq 0 ]; then
+        echo "Template removed successfully"
         return 0
+    else
+        echo "Error removing template"
+        return 1
     fi
 }
 
@@ -602,17 +606,46 @@ remove_templates() {
     local vmids=("$@")
     local success=0
     local failed=0
+    local templates_info=""
     
+    # First, verify all VMIDs and collect information
+    for vmid in "${vmids[@]}"; do
+        if ! qm status "$vmid" &>/dev/null; then
+            echo "Error: Template with VMID $vmid not found"
+            return 1
+        fi
+        
+        if ! qm config "$vmid" | grep -q "template: 1"; then
+            echo "Error: VM $vmid is not a template"
+            return 1
+        fi
+        
+        local name=$(qm config "$vmid" | grep "^name:" | cut -d' ' -f2-)
+        templates_info+="VMID: $vmid - Name: $name\n"
+    done
+    
+    # Show all templates that will be removed and ask for confirmation once
+    echo -e "\nThe following templates will be removed:\n"
+    echo -e "$templates_info"
+    read -p "Are you sure you want to remove these templates? (y/N) " -n 1 -r
+    echo
+    
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Operation cancelled"
+        return 0
+    fi
+    
+    # Process all templates
     for vmid in "${vmids[@]}"; do
         echo "Processing VMID $vmid..."
-        if remove_template "$vmid"; then
+        if remove_template "$vmid" "true"; then
             ((success++))
         else
             ((failed++))
         fi
-        echo
     done
     
+    echo
     echo "Summary:"
     echo "Successfully removed: $success"
     echo "Failed: $failed"
