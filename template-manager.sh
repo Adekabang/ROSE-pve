@@ -204,6 +204,11 @@ customize_image() {
         "freebsd")
             echo "FreeBSD. Skipping customization."
             ;;
+
+        # Windows (minimal customization needed)
+        "windows")
+            echo "Windows image. Using pre-configured image."
+            ;;
         
         # Unknown OS type
         *)
@@ -361,19 +366,39 @@ create_template() {
     customize_image "$filename" "$os_type_internal"
     
     # Create new VM with basic configuration
-    qm create $vmid --name $template_name --ostype l26 
-    qm set $vmid --net0 virtio,bridge=${NETWORK}
-    qm set $vmid --serial0 socket
-    qm set $vmid --memory ${MEMORY} --cores ${CPU} --cpu host
-    qm set $vmid --scsi0 ${STORAGE}:0,import-from="$(pwd)/$filename",discard=on,format=qcow2
-    qm set $vmid --boot order=scsi0 --scsihw virtio-scsi-single
-    qm set $vmid --agent enabled=1,fstrim_cloned_disks=1
-    qm set $vmid --ide2 ${STORAGE}:cloudinit
-    qm set $vmid --ipconfig0 "ip6=auto,ip=dhcp"
-    qm set $vmid --sshkeys "${SSH_KEYFILE}"
-    qm set $vmid --cipassword "${PASSWORD}"
-    qm set $vmid --ciuser "${USERNAME}"
-    qm set $vmid --nameserver "${NAMESERVER}"
+    if [ "$os_type" = "windows" ]; then
+        # Windows-specific VM configuration with Cloudbase-Init support
+        qm create $vmid --name $template_name --ostype win11 --memory ${MEMORY} --cores ${CPU} --cpu host
+        qm set $vmid --net0 virtio,bridge=${NETWORK}
+        qm set $vmid --scsi0 ${STORAGE}:0,import-from="$(pwd)/$filename",discard=on,format=qcow2
+        qm set $vmid --boot order=scsi0 --scsihw virtio-scsi-single
+        qm set $vmid --agent enabled=1,fstrim_cloned_disks=1
+        qm set $vmid --vga std
+        qm set $vmid --machine q35
+        # Add cloud-init drive for Cloudbase-Init
+        qm set $vmid --ide2 ${STORAGE}:cloudinit
+        qm set $vmid --ipconfig0 "ip6=auto,ip=dhcp"
+        qm set $vmid --ciuser "${USERNAME}"
+        qm set $vmid --cipassword "${PASSWORD}"
+        qm set $vmid --nameserver "${NAMESERVER}"
+        # Windows typically doesn't use SSH keys from cloud-init, but we'll include it for completeness
+        qm set $vmid --sshkeys "${SSH_KEYFILE}"
+    else
+        # Linux/BSD configuration
+        qm create $vmid --name $template_name --ostype l26 
+        qm set $vmid --net0 virtio,bridge=${NETWORK}
+        qm set $vmid --serial0 socket
+        qm set $vmid --memory ${MEMORY} --cores ${CPU} --cpu host
+        qm set $vmid --scsi0 ${STORAGE}:0,import-from="$(pwd)/$filename",discard=on,format=qcow2
+        qm set $vmid --boot order=scsi0 --scsihw virtio-scsi-single
+        qm set $vmid --agent enabled=1,fstrim_cloned_disks=1
+        qm set $vmid --ide2 ${STORAGE}:cloudinit
+        qm set $vmid --ipconfig0 "ip6=auto,ip=dhcp"
+        qm set $vmid --sshkeys "${SSH_KEYFILE}"
+        qm set $vmid --cipassword "${PASSWORD}"
+        qm set $vmid --ciuser "${USERNAME}"
+        qm set $vmid --nameserver "${NAMESERVER}"
+    fi
     
     # Attempt to resize the disk
     qm disk resize $vmid scsi0 15G || echo "Disk already larger than 15G or resize failed"
