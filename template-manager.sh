@@ -72,6 +72,21 @@ ensure_script_dir() {
     mkdir -p "$IMAGE_DIR" "$WORK_DIR"
 }
 
+# Function to print separator
+print_separator() {
+    printf "%-15s %-25s %s\n" "---------------" "-------------------------" "------------------------"
+}
+
+# Function to print OS header
+print_os_header() {
+    local os=$1
+    echo "${os^} Templates:"
+    echo "------------------------"
+    print_separator
+    printf "%-15s %-25s %s\n" "VERSION" "NAME" "TEMPLATE ID"
+    print_separator
+}
+
 # Function to list available templates
 list_templates() {
     local os_group=$1
