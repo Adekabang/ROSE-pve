@@ -27,21 +27,34 @@ fi
 : ${NAMESERVER:="1.1.1.1 8.8.8.8 2606:4700:4700::1001"}
 
 # Required commands
-REQUIRED_COMMANDS="jq wget libguestfs-tools"
+REQUIRED_COMMANDS="jq wget virt-customize"
 
 # Function to check required commands
 check_requirements() {
     local missing_commands=()
+    local missing_packages=()
     
     for cmd in $REQUIRED_COMMANDS; do
         if ! command -v "$cmd" >/dev/null 2>&1; then
             missing_commands+=("$cmd")
+            case "$cmd" in
+                "jq")
+                    missing_packages+=("jq")
+                    ;;
+                "wget")
+                    missing_packages+=("wget")
+                    ;;
+                "virt-customize")
+                    missing_packages+=("libguestfs-tools")
+                    ;;
+            esac
         fi
     done
     
     if [ ${#missing_commands[@]} -ne 0 ]; then
         echo "Error: Required commands are missing: ${missing_commands[*]}"
-        echo "Please install the missing commands and try again."
+        echo "Please install the following packages:"
+        printf '%s\n' "${missing_packages[@]}"
         exit 1
     fi
 }
