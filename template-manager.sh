@@ -544,7 +544,7 @@ list_existing_templates() {
     echo "============================="
     
     # Get all VMs and filter templates
-    qm list | grep "template" | while read -r line; do
+    qm list | grep "temp-" | while read -r line; do
         vmid=$(echo "$line" | awk '{print $1}')
         name=$(echo "$line" | awk '{print $2}')
         status=$(echo "$line" | awk '{print $3}')
