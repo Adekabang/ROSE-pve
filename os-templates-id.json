@@ -143,28 +143,5 @@
             "filename": "freebsd-14.2-zfs-2024-12-08.qcow2",
             "os_type": "freebsd"
         }
-    },
-    "windows": {
-        "2019": {
-            "name": "Windows Server 2019 Standard",
-            "template_name": "temp-windows-server-2019-standard",
-            "url": "https://os-cdn.virtfusion.net/windows/windows-server-2019-standard-virtfusion.qcow2",
-            "filename": "windows-server-2019-standard-virtfusion.qcow2",
-            "os_type": "windows"
-        },
-        "2022": {
-            "name": "Windows Server 2022 Standard",
-            "template_name": "temp-windows-server-2022-standard",
-            "url": "https://os-cdn.virtfusion.net/windows/windows-server-2022-standard-virtfusion.qcow2",
-            "filename": "windows-server-2022-standard-virtfusion.qcow2",
-            "os_type": "windows"
-        },
-        "2025": {
-            "name": "Windows Server 2025 Standard",
-            "template_name": "temp-windows-server-2025-standard",
-            "url": "https://os-cdn.virtfusion.net/windows/windows-server-2025-standard-virtfusion.qcow2",
-            "filename": "windows-server-2025-standard-virtfusion.qcow2",
-            "os_type": "windows"
-        }
     }
 } 
