@@ -13,7 +13,6 @@ A collection of tools for Proxmox VE administration, featuring a powerful templa
   - Rocky Linux (8 Green Obsidian, 9 Blue Onyx, 10)
   - AlmaLinux (8, 9, 10)
   - FreeBSD (13.4, 14.2 with UFS/ZFS options)
-  - Windows Server (2019, 2022, 2025) Standard editions
 - Cloud-init/Cloudbase-Init support for all templates
 - Group operations (download/create all templates for an OS)
 - Indonesian mirror support for faster downloads

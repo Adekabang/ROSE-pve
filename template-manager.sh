@@ -203,7 +203,7 @@ customize_image() {
             ;;
         
         # RHEL-based systems
-        "centos"|"rocky"|"alma"|"rocky8"|"alma8")
+        "centos"|"centos8"|"rocky"|"alma"|"rocky8"|"alma8")
             # CentOS 8 specific repository changes
             if [ "$os_type" = "centos8" ]; then
                 virt-customize -a "$file_name" --run-command "sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*"
