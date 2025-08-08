@@ -183,7 +183,13 @@ customize_image() {
 
     case $os_type in
         # Debian-based systems
-        "debian"|"ubuntu")
+        "debian"|"debian-eol"|"ubuntu")
+            # Debian EOL specific repository changes
+            if [ "$os_type" = "debian-eol" ]; then
+                # virt-customize -a "$file_name" --run-command "sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*"
+                virt-customize -a "$file_name" --run-command "sed -i 's|http://deb.debian.org|http://archive.debian.org|g' /etc/apt/sources.list"
+                virt-customize -a "$file_name" --run-command "sed -i 's|http://security.debian.org|http://archive.debian.org|g' /etc/apt/sources.list"
+            fi
             virt-customize -a "$file_name" --install qemu-guest-agent,vim,wget
             virt-customize -a "$file_name" --run-command "systemctl enable qemu-guest-agent"
             virt-customize -a "$file_name" --timezone "$TIMEZONE"

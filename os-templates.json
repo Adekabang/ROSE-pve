@@ -5,7 +5,7 @@
             "template_name": "temp-debian-10",
             "url": "https://cloud.debian.org/images/cloud/buster/latest/debian-10-genericcloud-amd64.qcow2",
             "filename": "debian-10-genericcloud-amd64.qcow2",
-            "os_type": "debian"
+            "os_type": "debian-eol"
         },
         "11": {
             "name": "Debian 11",
