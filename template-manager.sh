@@ -193,7 +193,7 @@ customize_image() {
             virt-customize -a "$file_name" --run-command "systemctl enable qemu-guest-agent"
             virt-customize -a "$file_name" --timezone "$TIMEZONE"
             
-            if [ "$os_type" != "debian-eol" ]; then
+            if [ "$os_type" = "ubuntu" ]; then
                 virt-customize -a "$file_name" --run-command "mv /etc/ssh/sshd_config.d/60-cloudimg-settings.conf /etc/ssh/sshd_config.d/60-cloudimg-settings.conf.disable"
             fi
             
