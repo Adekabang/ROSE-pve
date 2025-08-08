@@ -186,14 +186,17 @@ customize_image() {
         "debian"|"debian-eol"|"ubuntu")
             # Debian EOL specific repository changes
             if [ "$os_type" = "debian-eol" ]; then
-                # virt-customize -a "$file_name" --run-command "sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*"
                 virt-customize -a "$file_name" --run-command "sed -i 's|http://deb.debian.org|http://archive.debian.org|g' /etc/apt/sources.list"
                 virt-customize -a "$file_name" --run-command "sed -i 's|http://security.debian.org|http://archive.debian.org|g' /etc/apt/sources.list"
             fi
             virt-customize -a "$file_name" --install qemu-guest-agent,vim,wget
             virt-customize -a "$file_name" --run-command "systemctl enable qemu-guest-agent"
             virt-customize -a "$file_name" --timezone "$TIMEZONE"
-            virt-customize -a "$file_name" --run-command "mv /etc/ssh/sshd_config.d/60-cloudimg-settings.conf /etc/ssh/sshd_config.d/60-cloudimg-settings.conf.disable"
+            
+            if [ "$os_type" != "debian-eol" ]; then
+                virt-customize -a "$file_name" --run-command "mv /etc/ssh/sshd_config.d/60-cloudimg-settings.conf /etc/ssh/sshd_config.d/60-cloudimg-settings.conf.disable"
+            fi
+            
             virt-customize -a "$file_name" --run-command 'sed -i -e "s/^#Port 22/Port 22/" -e "s/^#AddressFamily any/AddressFamily any/" -e "s/^#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/" -e "s/^#ListenAddress ::/ListenAddress ::/" /etc/ssh/sshd_config'
             virt-customize -a "$file_name" --run-command 'sed -i "/^#PasswordAuthentication[[:space:]]/cPasswordAuthentication yes" /etc/ssh/sshd_config && sed -i "/^PasswordAuthentication no/cPasswordAuthentication yes" /etc/ssh/sshd_config'
             virt-customize -a "$file_name" --run-command 'sed -i "s/^#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config'
