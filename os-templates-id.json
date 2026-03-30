@@ -150,5 +150,14 @@
             "filename": "freebsd-14.2-zfs-2024-12-08.qcow2",
             "os_type": "freebsd"
         }
+    },
+     "windows": {
+        "10": {
+            "name": "Windows 10",
+            "template_name": "temp-windows-10",
+            "url": "https://cp.akumavm.com/public/windows-ltsc.qcow2",
+            "filename": "windows-ltsc.qcow2",
+            "os_type": "windows"
+        }
     }
 } 
